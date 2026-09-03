@@ -99,6 +99,14 @@
 
   .device-count{font-size:12px; color:var(--gray-500); margin-bottom:10px;}
 
+  .highlight-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(280px,1fr)); gap:12px;}
+  .highlight-item{background:rgba(255,255,255,0.5); border:1px solid var(--glass-border); border-radius:16px; padding:16px 18px;}
+  .highlight-item h4{margin:0 0 6px; font-size:14px; color:var(--blue-700);}
+  .highlight-item p{margin:0; font-size:12.5px; color:var(--gray-700); line-height:1.6;}
+  .mini-table-wrap{margin-top:12px; overflow-x:auto; border-radius:12px; border:1px solid var(--glass-border);}
+  .mini-table-wrap table{font-size:11.5px;}
+  .region-total-badge{display:inline-flex; align-items:center; gap:6px; background:rgba(238,246,251,0.8); color:var(--blue-700); font-weight:800; padding:6px 14px; border-radius:999px; font-size:13px; margin-right:8px;}
+
   @media (max-width:760px){
     .card{padding:16px 14px;}
   }
@@ -140,6 +148,8 @@ const LABS_OFFICIAL_WORKFORCE = [{"facility": "مستشفى برج الشمال 
 const RADIOLOGY_OFFICIAL_WORKFORCE = [{"facility": "مستشفى برج الشمال الطبي", "current": 7, "need": 5, "notes": "مستشفى 300 سرير يخدم طوارئ وتنويم. الكادر الحالي لا يغطي فترات الذروة. (3 أخصائي، 4 فني)"}, {"facility": "مستشفى الامير عبد العزيز بن مساعد", "current": 7, "need": 5, "notes": "ارتفاع الطلب على الأشعة التشخيصية، والحاجة لدعم الكادر الفني، والكادر الحالي لا يغطي فترات الذروة. (2 أخصائي، 5 فني)"}, {"facility": "مستشفى طريف العام", "current": 13, "need": 1, "notes": "العجز تخصصي فقط في أشعة النساء — الحاجة لأخصائية أشعة تعود لطبيعة الحالات النسائية (فحوصات مثل الماموغرام). (2 أخصائي، 11 فني)"}, {"facility": "مستشفى رفحاء العام", "current": 27, "need": null, "notes": "14 أخصائي، 12 فني، 1 أخصائي أول"}, {"facility": "مستشفى النساء والولادة بعرعر", "current": 10, "need": null, "notes": "6 أخصائي، 4 فني"}, {"facility": "مستشفى النساء والأطفال برفحاء", "current": 8, "need": null, "notes": "7 أخصائي، 1 فني"}, {"facility": "مستشفى العويقيلة العام", "current": 5, "need": 2, "notes": "مرجع لعدد من المراكز الصحية التابعة، ويحتاج أخصائية أشعة نساء نظرًا لخصوصية حالات النساء. (2 أخصائي، 3 فني)"}, {"facility": "مستشفى الشعبة العام", "current": 6, "need": 1, "notes": "يخدم عددًا من المراكز الصحية المرتبطة، ويحتاج أخصائية أشعة نساء. (6 أخصائي)"}, {"facility": "مستشفى جديدة عرعر العام", "current": 1, "need": 1, "notes": "الكادر الحالي غير كافٍ لتغطية ساعات العمل. (1 فني)"}];
 const RESPIRATORY_OFFICIAL_WORKFORCE = [{"facility": "مستشفى برج الشمال الطبي", "current": 4, "need": 5, "notes": "بسبب استحداث خدمات المناظير الرئوية وإعادة فتح عيادة وظائف الرئة. نطاق الخدمة أعلى من مستشفيات المنطقة (عناية مركزة، أجهزة bipap/cpap، عيادة وظائف الرئة، مناظير رئوية، طوارئ، فريق الإنعاش)."}, {"facility": "مستشفى الامير عبد العزيز بن مساعد", "current": 1, "need": 3, "notes": "لتغطية العناية المركزة والطوارئ ونقل حالات المرضى على أجهزة تنفس داخل وخارج المستشفى."}, {"facility": "مستشفى طريف العام", "current": 2, "need": null, "notes": ""}, {"facility": "مستشفى رفحاء العام", "current": 1, "need": 1, "notes": "لتغطية مرضى العناية المركزة والطوارئ ونقل الحالات."}, {"facility": "مستشفى النساء والولادة بعرعر", "current": 4, "need": 2, "notes": "كافٍ لتغطية عناية الخدج وعناية الأطفال حاليًا."}, {"facility": "مستشفى النساء والأطفال برفحاء", "current": 0, "need": 2, "notes": "لا يوجد أي أخصائي علاج تنفسي بالمستشفى — لتغطية عناية الخدج والأطفال والطوارئ."}, {"facility": "مستشفى العويقيلة العام", "current": 1, "need": null, "notes": ""}, {"facility": "مستشفى الشعبة العام", "current": 1, "need": null, "notes": ""}, {"facility": "مستشفى جديدة عرعر العام", "current": 0, "need": null, "notes": ""}, {"facility": "مركز الأمير عبدالله بن مساعد لطب وجراحة القلب", "current": 1, "need": 2, "notes": "لتغطية العناية المركزة لجراحة القلب والقلب ونقل الحالات (ليس لديهم قسم طوارئ)."}];
 const NUTRITION_OFFICIAL_WORKFORCE = [{"facility": "مستشفى النساء والولادة عرعر", "gen_current": 2, "gen_need": null, "ther_current": 0, "ther_need": 1, "notes": "لسد الاحتياج حسب حاجة العمل", "uncertain": false}, {"facility": "مستشفى برج الشمال الطبي", "gen_current": 1, "gen_need": 1, "ther_current": 1, "ther_need": 1, "notes": "لضمان استمرارية الإشراف على جميع المهام المناطة بقسم التغذية", "uncertain": false}, {"facility": "مستشفى الأمير عبدالعزيز بن مساعد", "gen_current": 1, "gen_need": null, "ther_current": 0, "ther_need": 1, "notes": "لسد الاحتياج حسب حاجة العمل", "uncertain": false}, {"facility": "مستشفى الرعاية المديدة", "gen_current": 0, "gen_need": null, "ther_current": 0, "ther_need": 1, "notes": "لضمان استمرارية الإشراف على جميع المهام المناطة بقسم التغذية", "uncertain": true}, {"facility": "مركز الأمير عبدالله بن مساعد لطب وجراحة القلب", "gen_current": null, "gen_need": null, "ther_current": 0, "ther_need": null, "notes": "بيانات غير واضحة بالمستند الأصلي", "uncertain": true}, {"facility": "مجمع إرادة والصحة النفسية", "gen_current": null, "gen_need": null, "ther_current": 0, "ther_need": null, "notes": "بيانات غير واضحة بالمستند الأصلي", "uncertain": true}, {"facility": "مستشفى رفحاء العام", "gen_current": 3, "gen_need": null, "ther_current": 0, "ther_need": 1, "notes": "لرفع الجاهزية وتغطية العمل بكفاءة", "uncertain": false}, {"facility": "مستشفى النساء والولادة والأطفال برفحاء", "gen_current": 1, "gen_need": null, "ther_current": 0, "ther_need": 1, "notes": "لسد الاحتياج حسب حاجة العمل", "uncertain": false}, {"facility": "مستشفى الشعبة العام", "gen_current": 1, "gen_need": 1, "ther_current": 0, "ther_need": 1, "notes": "لضمان استمرارية الإشراف ورفع الجاهزية وتغطية العمل بكفاءة", "uncertain": false}, {"facility": "مستشفى طريف العام", "gen_current": 0, "gen_need": 1, "ther_current": 0, "ther_need": 1, "notes": "لتطبيق ضوابط سياسات قسم التغذية", "uncertain": false}, {"facility": "مستشفى جديدة عرعر العام", "gen_current": 0, "gen_need": 1, "ther_current": 0, "ther_need": 1, "notes": "لسد الاحتياج حسب حاجة العمل", "uncertain": false}, {"facility": "مستشفى العويقيلة العام", "gen_current": 1, "gen_need": 1, "ther_current": 0, "ther_need": 1, "notes": "لضمان استمرارية الإشراف ورفع الجاهزية وتغطية العمل بكفاءة (1 فني تغذية)", "uncertain": false}];
+const REGIONAL_WORKFORCE = {"regions": ["عرعر + جديدة عرعر", "طريف", "رفحاء", "العويقيلة", "الشعبة"], "data": {"labs": {"label": "إجمالي منسوبي المختبرات", "values": [123, 24, 14, 7, 6]}, "pharmacy": {"label": "إجمالي منسوبي الرعاية الصيدلانية", "values": [109, 28, 36, 13, 6]}, "radiology": {"label": "إجمالي منسوبي الأشعة (داخل المستشفيات)", "values": [58, 37, 14, 7, 6]}, "nutrition": {"rows": [{"label": "تغذية عامة", "values": [6, 0, 4, 1, 1]}, {"label": "تغذية علاجية", "values": [2, 0, 0, 0, 0]}]}, "rehab": {"rows": [{"label": "الطب الطبيعي", "values": [5, 0, 1, 0, 0]}, {"label": "العلاج الطبيعي", "values": [19, 7, 9, 2, 2]}, {"label": "العلاج الوظيفي", "values": [5, 2, 2, 0, 0]}, {"label": "النطق والتخاطب", "values": [0, 1, 0, 0, 0]}, {"label": "الأطراف الصناعية", "values": [2, 0, 0, 0, 0]}]}, "mental": {"rows": [{"label": "الخدمة الاجتماعية", "values": [26, 4, 1, 0, 0]}, {"label": "الأخصائي النفسي", "values": [9, 1, 0, 0, 1]}, {"label": "طبيب نفسي", "values": [12, 2, 1, 0, 0]}]}}};
+const DEPARTMENT_HIGHLIGHTS = {"labs": [{"title": "مشروع عينتي", "summary": "ربط مختبرات مراكز الرعاية الصحية الأولية بمختبرات المستشفيات لمركزة الفحوصات وتحسين الخدمات المخبرية المقدمة للمستفيد."}, {"title": "تحسين بيئة العمل", "summary": "في مختبر برج الشمال الطبي، ومختبر مستشفى طريف العام، ومختبر مستشفى النساء والولادة بعرعر."}, {"title": "تشغيل المختبر الآلي بمستشفى النساء والولادة بعرعر", "summary": "دقة عالية تصل إلى 1200 عينة في الساعة، بالتعاون مع شركة بيكمان كولتر."}, {"title": "توسّع نطاق الخدمة بالمختبر الإقليمي", "summary": "نمو من 367 فحص عام 2023 إلى 847 فحص عام 2025."}, {"title": "فحوصات مستحدثة 2024", "summary": "Fecal Calprotectin (التهاب القولون)، QuantiFERON TB Gold (السل الكامن)، فحوصات الحساسية بتقنية Immunoblot."}, {"title": "فحوصات مستحدثة 2025", "summary": "فحوصات مناعة وأمصال إضافية: ANA/ANCA/EMA، تأكيد الزهري، تأكيد HIV، الحصبة والنكاف (IgM)."}], "pharmacy": [{"title": "البريد الدوائي", "summary": "1,825 شحنة بالنصف الأول من 2026 مقابل 1,620 بنفس الفترة من 2025 — نمو 112.65% على مستوى التجمع.", "table": {"headers": ["المنشأة", "الحالة", "شحنات 2025 (ن1)", "شحنات 2026 (ن1)", "الأداء"], "rows": [["مستشفى برج الشمال الطبي", "مفعّل", "300", "290", "96.7% (جيد جدًا)"], ["مستشفى الأمير عبدالعزيز بن مساعد", "مفعّل", "912", "550", "60.3% (يحتاج تحسين)"], ["مستشفى النساء والولادة والأطفال بعرعر", "مفعّل", "0", "شحنة واحدة", "متعثر"], ["مستشفى إرادة والصحة النفسية", "مفعّل", "10", "136", "1360% (ممتاز)"], ["مستشفى الرعاية المديدة", "مفعّل", "217", "145", "66.8% (يحتاج تحسين)"], ["مركز الأمير عبدالله لطب وجراحة القلب", "مفعّل", "170", "696", "409% (ممتاز)"], ["مستشفى رفحاء المركزي", "مفعّل", "6", "0", "يحتاج تحسين"], ["مستشفى طريف العام", "مفعّل", "10", "2", "20% (متعثر)"]]}}, {"title": "غرفة المحاليل الوريدية", "summary": "متطلبات التشغيل: غرفة معقمة بمعايير عالمية، نظام تدفق هواء أحادي الاتجاه ISO Class 5، ضغط إيجابي، ضبط حرارة ورطوبة، طاقم صيدلاني مدرب (يفضّل إكلينيكي). خطة التفعيل على 5 مراحل، بالأولوية لمنطقة عرعر (برج الشمال، الأمير عبدالعزيز، النساء والولادة) ثم رفحاء ثم طريف."}, {"title": "عقد تغذية وريدية للأطفال الخدج", "summary": "مع شركة خارجية متخصصة لمستشفى طريف العام ومستشفى النساء والولادة والأطفال برفحاء — 4 مستفيدين و37 طلب تغذية وريدية حتى نهاية 2025."}, {"title": "تكويد الأدوية بالاسم العلمي والتجاري", "summary": "أكثر من 6,500 بند دوائي، تنفيذ خلال مدة قياسية ابتداءً من يوليو 2025، دعمًا للتحول الرقمي وتوحيد البيانات الدوائية."}, {"title": "خدمة الاستفسارات الدوائية", "summary": "تسهّل وصول المستفيدين للصيدلي المختص للإجابة عن الأسئلة الدوائية بخصوصية عالية، مع بناء قاعدة بيانات مرجعية بالاستفسارات."}], "radiology": [{"title": "مبادرة \"رايتك وردية\"", "summary": "مبادرة مسائية للكشف المبكر عن سرطان الثدي بالماموغرام، بالتعاون مع جمعية حياة لسرطان الثدي بالحدود الشمالية."}, {"title": "المركز الأول بالمؤشر الوزاري", "summary": "تحقيق المركز الأول بمؤشر الكشف المبكر لسرطان الثدي لسنتين متتاليتين."}, {"title": "القافلة الصحية المتنقلة", "summary": "المشاركة في العيادة المتنقلة للكشف المبكر عن سرطان الثدي في القرى والهجر."}], "nutrition": [{"title": "استقرار عقود التغذية بالكامل", "summary": "ترسية 5 عقود جديدة خلال 2025 (شركة الخليج، صالح هادي آل حيدر، مجموعة الهناء التجارية ×2) — انتقال من مخاطر تعثر الخدمة إلى تشغيل فعلي دون انقطاع لكل المستشفيات."}, {"title": "الخطة التطويرية 2026", "summary": "استراتيجية على 3 محاور: التميز التشغيلي (توحيد الإجراءات)، التحول الرقمي (أتمتة ومؤشرات أداء)، والابتكار وتجربة المستفيد."}, {"title": "إنجازات الربع الأول 2026", "summary": "إتمام الزيارات التفقدية لكل الأقسام (100%)، إنشاء داشبورد قسم التغذية (100%)، تصميم مؤشر رفع المستخلصات الشهرية (100%)، إقفال 90% من مستخلصات 2025 المتعثرة."}], "rehab": [{"title": "مركز التأهيل الطبي الجديد بعرعر", "summary": "تشغيل المرحلة الأولى بقيمة تجهيزات تتجاوز 9 مليون ريال، تشغيل تجريبي أغسطس 2025، ويشمل 4 تخصصات: الطب الطبيعي، العلاج الطبيعي، العلاج الوظيفي، والأطراف الصناعية."}, {"title": "تفعيل أسرّة الرعاية المديدة للأطفال", "summary": "4 أسرّة بمستشفى النساء والأطفال بعرعر لرعاية الحالات المزمنة والمعقدة التي تتطلب إقامة طويلة."}, {"title": "تفعيل مسار السكتات الدماغية", "summary": "وتعميمه على جميع منشآت التجمع."}, {"title": "تفعيل مسار الأطراف الصناعية", "summary": "وتحسين معايير الوصول الشامل للأشخاص ذوي الإعاقة بالمستشفيات."}, {"title": "أعلى نسبة رضا على مستوى التجمعات الصحية", "summary": "تحقيق أعلى نسبة رضا لأقسام التأهيل مقارنة ببقية التجمعات الصحية."}], "mental": [{"title": "تهيئة الأجنحة النفسية بالمستشفيات العامة", "summary": "وتفعيل العيادات النفسية ودمج الخدمات النفسية والاجتماعية بالمستشفيات والمراكز الصحية."}, {"title": "مبادرة \"طمنا عليك يا غالي\"", "summary": "بمجمع إرادة للصحة النفسية، لخفض معدلات الانتكاسة عبر تعزيز المتابعة بعد الخروج من التنويم."}, {"title": "تفعيل مسار الأطفال ذوي الظروف الخاصة", "summary": "يشمل الأطفال مجهولي الأبوين، وتوحيد آليات التنسيق بين المستشفيات ودور الرعاية."}, {"title": "تفعيل عيادات الإدمان", "summary": "بمستشفى طريف ورفحاء والعويقيلة."}, {"title": "تفعيل عيادة الاحتراق الوظيفي", "summary": "بأربع مستشفيات: برج الشمال الطبي، رفحاء العام، العويقيلة، مجمع إرادة والصحة النفسية."}, {"title": "تفعيل اللجنة النفسية الجنائية", "summary": "بتجمع الحدود الشمالية، تخفيفًا لمرضى منطقة الحدود الشمالية ومنطقة الجوف."}]};
 const RADIOLOGY_EQUIPMENT = {"columns": ["X-RAY Fixed", "X-RAY Mobile", "CT-Scan", "MRI System", "Bone denstometer", "Mamography", "U/S Imaging system", "U/S machine", "Cath LAB", "Brone breast biopsy", "C-ARM", "Fluroscopy", "X-RAY panoramic"], "rows": [{"facility": "برج الشمال الطبي", "values": [3, 4, 1, 1, 1, 1, null, 11, 1, null, 7, 1, null]}, {"facility": "مستشفى الامير عبدالعزيز بن مساعد", "values": [2, 3, 1, 1, null, 1, null, 1, null, 1, 3, 1, null]}, {"facility": "مركز الأمير عبدالله لطب وجراحة القلب", "values": [null, 3, 1, null, null, null, null, 8, 1, null, null, null, null]}, {"facility": "مستشفى النساء والولادة والأطفال بعرعر", "values": [4, 6, 1, 1, 1, 1, null, 18, null, null, null, 1, null]}, {"facility": "مستشفى رفحاء العام", "values": [4, 2, 1, 1, 1, 1, null, 9, null, null, 2, 1, null]}, {"facility": "مستشفى النساء والولادة والأطفال برفحاء", "values": [1, 4, 1, null, null, null, null, 8, null, null, null, null, null]}, {"facility": "مستشفى طريف العام", "values": [3, 5, 1, 1, null, 1, null, 12, null, null, 3, null, null]}, {"facility": "مجمع إرادة", "values": [1, 1, null, null, null, null, null, null, null, null, null, null, null]}, {"facility": "الرعاية المديدة", "values": [null, 1, null, null, null, null, null, 1, null, null, null, null, null]}, {"facility": "مستشفى جديدة عرعر", "values": [1, 1, 1, null, null, null, null, 3, null, null, null, 1, null]}, {"facility": "مستشفى العويقيلة العام", "values": [1, 2, 1, null, null, null, null, 7, null, null, null, 1, 1]}, {"facility": "مستشفى شعبة نصاب العام", "values": [1, 2, 1, null, null, null, null, 3, null, null, null, 1, null]}, {"facility": "مركز طب الاسنان التخصصي عرعر", "values": [null, null, null, null, null, null, null, null, null, null, null, null, 2]}, {"facility": "مركز طب الاسنان التخصصي رفحاء", "values": [null, null, null, null, null, null, null, null, null, null, null, null, 1]}, {"facility": "مركز طب الاسنان التخصصي طريف", "values": [null, null, null, null, null, null, null, null, null, null, null, null, 1]}, {"facility": "عربة الاشعة المتنقلة", "values": [null, 1, null, null, null, 1, null, 3, null, null, null, null, null]}, {"facility": "الرعاية الاولية", "values": [2, 4, null, null, null, null, null, 31, null, null, null, null, null]}]};
 
 const firebaseConfig = {
@@ -260,6 +270,71 @@ function renderNutritionOfficialCard(){
           <tbody>${rows}</tbody>
         </table>
       </div>
+    </div>
+  `;
+}
+
+function renderRegionalWorkforceCard(deptId){
+  const entry = REGIONAL_WORKFORCE.data[deptId];
+  if(!entry) return '';
+  const regions = REGIONAL_WORKFORCE.regions;
+  let rowsData;
+  if(entry.rows){
+    rowsData = entry.rows;
+  } else {
+    rowsData = [{label: entry.label, values: entry.values}];
+  }
+  const grandTotal = rowsData.reduce((sum,r) => sum + r.values.reduce((a,b)=>a+b,0), 0);
+  const colTotals = regions.map((_, i) => rowsData.reduce((sum,r) => sum + r.values[i], 0));
+
+  let rowsHtml = rowsData.map(r => `
+    <tr><td>${escapeHtml(r.label)}</td>${r.values.map(v => `<td>${v}</td>`).join('')}<td style="font-weight:800; color:var(--blue-600);">${r.values.reduce((a,b)=>a+b,0)}</td></tr>
+  `).join('');
+  if(rowsData.length > 1){
+    rowsHtml += `<tr class="totals-row"><td>الإجمالي</td>${colTotals.map(v=>`<td>${v}</td>`).join('')}<td>${grandTotal}</td></tr>`;
+  }
+
+  return `
+    <div class="card">
+      <h3>👥 القوى العاملة — الإجمالي والتوزيع</h3>
+      <div style="margin-bottom:14px;"><span class="region-total-badge">📊 إجمالي المنسوبين: ${grandTotal}</span></div>
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>التخصص</th>${regions.map(r=>`<th>${escapeHtml(r)}</th>`).join('')}<th>الإجمالي</th></tr></thead>
+          <tbody>${rowsHtml}</tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+function renderHighlightsCard(deptId){
+  const items = DEPARTMENT_HIGHLIGHTS[deptId];
+  if(!items || items.length === 0) return '';
+  const cards = items.map(h => {
+    let tableHtml = '';
+    if(h.table){
+      tableHtml = `
+        <div class="mini-table-wrap">
+          <table>
+            <thead><tr>${h.table.headers.map(x=>`<th>${escapeHtml(x)}</th>`).join('')}</tr></thead>
+            <tbody>${h.table.rows.map(r => `<tr>${r.map(c=>`<td>${escapeHtml(c)}</td>`).join('')}</tr>`).join('')}</tbody>
+          </table>
+        </div>
+      `;
+    }
+    return `
+      <div class="highlight-item" style="${h.table ? 'grid-column:1/-1;' : ''}">
+        <h4>✦ ${escapeHtml(h.title)}</h4>
+        <p>${escapeHtml(h.summary)}</p>
+        ${tableHtml}
+      </div>
+    `;
+  }).join('');
+  return `
+    <div class="card">
+      <h3>🏆 خدمات ومنجزات القسم</h3>
+      <div class="highlight-grid">${cards}</div>
     </div>
   `;
 }
@@ -404,11 +479,13 @@ async function renderDeptContent(){
       <h2>${escapeHtml(dept.name)}</h2>
       <p>القوى العاملة${dept.hasEquipment ? ' والأجهزة' : ''} الخاصة بالقسم</p>
     </div>
+    ${renderRegionalWorkforceCard(dept.id)}
     ${(dept.id === 'labs' || dept.id === 'radiology' || dept.id === 'nutrition') ? '' : renderWorkforceCard(dept)}
     ${dept.id === 'labs' ? renderLabOfficialWorkforceCard() : ''}
     ${dept.id === 'radiology' ? renderOfficialWorkforceCard('القوى العاملة الرسمية — الأشعة', RADIOLOGY_OFFICIAL_WORKFORCE) : ''}
     ${dept.id === 'nutrition' ? renderNutritionOfficialCard() : ''}
     ${dept.id === 'rehab' ? renderWorkforceCard(dept) + renderOfficialWorkforceCard('القوى العاملة الرسمية — العلاج التنفسي', RESPIRATORY_OFFICIAL_WORKFORCE) : ''}
+    ${renderHighlightsCard(dept.id)}
     ${dept.hasEquipment === 'labs' ? renderLabEquipmentCard() : ''}
     ${dept.hasEquipment === 'radiology' ? renderRadiologyEquipmentCard() : ''}
     ${dept.hasEquipment === 'rehab' ? renderEquipmentPlaceholder(dept.name) : ''}
