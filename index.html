@@ -253,6 +253,15 @@
   .staff-card .sname{font-size:14.5px; font-weight:800; color:var(--gray-900);}
   .staff-card .stitle{font-size:12px; color:var(--blue-600); font-weight:700; margin-top:2px;}
   .staff-card .sdept{font-size:11.5px; color:var(--gray-500); margin-top:2px; margin-bottom:10px;}
+
+  /* archive list */
+  .archive-list{display:flex; flex-direction:column; gap:10px; margin-top:16px;}
+  .archive-item{
+    display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap;
+    background:var(--glass-bg); backdrop-filter:var(--glass-blur); -webkit-backdrop-filter:var(--glass-blur);
+    border:1px solid var(--glass-border); border-radius:var(--radius); padding:14px 18px; box-shadow:var(--shadow);
+  }
+  .archive-item-name{font-weight:700; font-size:14px; color:var(--gray-900);}
   .staff-card .scontact{font-size:12px; color:var(--gray-700); display:flex; align-items:center; gap:6px; margin-top:4px;}
 </style>
 </head>
@@ -337,6 +346,9 @@
         <p class="muted">مشاريع ومبادرات الأقسام مع نسبة الإنجاز والحالة</p>
       </div>
       <div class="stats-row" id="projectStatsRow"></div>
+      <div class="toolbar">
+        <button class="btn btn-primary" id="addProjectBtn">+ إضافة مشروع</button>
+      </div>
       <div class="tabs" id="projectDeptTabs"></div>
       <div id="projectsGrid" class="projects-grid"></div>
     </div>
@@ -349,6 +361,19 @@
         <input type="text" id="staffSearchInput" placeholder="ابحث بالاسم أو القسم أو المسمى الوظيفي...">
       </div>
       <div id="staffGrid" class="staff-grid"></div>
+    </div>
+
+    <div id="section-archive" class="section-panel" style="display:none;">
+      <div class="panel-head">
+        <h2>أرشيف الإدارة</h2>
+        <p class="muted">ملفات ومستندات كل قسم — أجهزة، قوى عاملة، تقارير، وأي مستند آخر</p>
+      </div>
+      <div class="tabs" id="archiveDeptTabs"></div>
+      <div class="toolbar">
+        <input type="file" id="archiveFileInput">
+        <span class="hint" style="margin-right:auto;">الحد الأقصى لحجم الملف الواحد 650 كيلوبايت</span>
+      </div>
+      <div id="archiveFileList" class="archive-list"></div>
     </div>
 
   </div>
@@ -428,6 +453,68 @@
     </div>
   </div>
 
+  <!-- Project Modal -->
+  <div class="modal-overlay" id="projectModalOverlay">
+    <div class="modal">
+      <div class="modal-head">
+        <h3 id="projectModalTitle">إضافة مشروع</h3>
+        <button class="modal-close" id="projectModalCloseBtn">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="field">
+          <label>القسم</label>
+          <input type="text" id="p_dept" placeholder="مثال: قسم المختبرات">
+        </div>
+        <div class="field">
+          <label>اسم المشروع</label>
+          <input type="text" id="p_name" placeholder="اسم المشروع أو المبادرة">
+        </div>
+        <div class="field">
+          <label>وصف المشروع</label>
+          <textarea id="p_desc" placeholder="وصف مختصر للمشروع وأهدافه"></textarea>
+        </div>
+        <div class="field">
+          <label>المسؤول</label>
+          <input type="text" id="p_resp" placeholder="اسم المسؤول عن المشروع">
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>تاريخ البداية</label>
+            <input type="date" id="p_start">
+          </div>
+          <div class="field">
+            <label>تاريخ النهاية</label>
+            <input type="date" id="p_end">
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>نسبة الإنجاز (%)</label>
+            <input type="text" id="p_pct" placeholder="مثال: 70">
+          </div>
+          <div class="field">
+            <label>الحالة</label>
+            <select id="p_status">
+              <option>لم يبدأ</option>
+              <option>قيد التنفيذ</option>
+              <option>مكتمل</option>
+              <option>متأخر</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label>ملاحظات / تحديثات</label>
+          <textarea id="p_blocker" placeholder="آخر مستجدات أو معوقات المشروع"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" id="projectCancelBtn">إلغاء</button>
+        <button class="btn btn-danger-ghost" id="projectDeleteBtn" style="display:none;">حذف</button>
+        <button class="btn btn-primary" id="projectSaveBtn">حفظ</button>
+      </div>
+    </div>
+  </div>
+
   <div class="toast" id="toast"></div>
 
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
@@ -443,6 +530,7 @@ const SECTIONS = [
   {id:'workforce', label:'القوى العاملة', icon:'👥'},
   {id:'projects', label:'لوحة المشاريع', icon:'📊'},
   {id:'staff', label:'بيانات الموظفين', icon:'🪪'},
+  {id:'archive', label:'أرشيف الإدارة', icon:'🗄️'},
 ];
 let activeSection = 'tasks';
 
@@ -465,6 +553,7 @@ function switchSection(id){
   if(id === 'workforce') renderWorkforce();
   if(id === 'projects') renderProjects();
   if(id === 'staff') renderStaff();
+  if(id === 'archive') renderArchiveTabs();
 }
 
 /* ---------- Workforce (editable, current vs needed) ---------- */
@@ -619,15 +708,33 @@ if(addHospitalBtn){
   });
 }
 
-/* ---------- Projects ---------- */
+/* ---------- Projects (editable) ---------- */
+let projectsData = null;
 let projectDeptFilter = '';
-function renderProjects(){
-  const depts = [...new Set(PROJECTS_DATA.map(p => p.dept))];
+let editingProjectId = null;
+
+async function loadProjectsData(){
+  let data = await storageGet('projectsData');
+  if(!data){
+    data = JSON.parse(JSON.stringify(PROJECTS_DATA));
+    await storageSet('projectsData', data);
+  }
+  return data;
+}
+async function saveProjectsData(){
+  await storageSet('projectsData', projectsData);
+}
+
+async function renderProjects(){
+  if(!projectsData){
+    projectsData = await loadProjectsData();
+  }
+  const depts = [...new Set(projectsData.map(p => p.dept).filter(Boolean))];
   const statsEl = document.getElementById('projectStatsRow');
   const counts = {'مكتمل':0,'قيد التنفيذ':0,'لم يبدأ':0,'متأخر':0};
-  PROJECTS_DATA.forEach(p => { if(counts[p.status] !== undefined) counts[p.status]++; });
+  projectsData.forEach(p => { if(counts[p.status] !== undefined) counts[p.status]++; });
   statsEl.innerHTML = `
-    <div class="stat-card total"><div class="num">${PROJECTS_DATA.length}</div><div class="lbl">إجمالي المشاريع</div></div>
+    <div class="stat-card total"><div class="num">${projectsData.length}</div><div class="lbl">إجمالي المشاريع</div></div>
     <div class="stat-card done"><div class="num">${counts['مكتمل']}</div><div class="lbl">مكتمل</div></div>
     <div class="stat-card progress"><div class="num">${counts['قيد التنفيذ']}</div><div class="lbl">قيد التنفيذ</div></div>
     <div class="stat-card notstarted"><div class="num">${counts['لم يبدأ']}</div><div class="lbl">لم يبدأ</div></div>
@@ -643,12 +750,12 @@ function renderProjects(){
   });
 
   const grid = document.getElementById('projectsGrid');
-  const list = PROJECTS_DATA.filter(p => !projectDeptFilter || p.dept === projectDeptFilter);
+  const list = projectsData.filter(p => !projectDeptFilter || p.dept === projectDeptFilter);
   grid.innerHTML = list.map(p => {
     const st = STATUS_STYLE[p.status] || STATUS_STYLE['لم يبدأ'];
     const pct = (typeof p.pct === 'number') ? p.pct : null;
     return `
-      <div class="project-card">
+      <div class="project-card" data-pid="${p.id}" style="cursor:pointer;">
         <div class="pdept">${escapeHtml(p.dept)}</div>
         <div class="pname">${escapeHtml(p.name) || '<span class="muted">بدون اسم</span>'}</div>
         ${p.desc ? `<div class="pdesc">${escapeHtml(p.desc)}</div>` : ''}
@@ -665,7 +772,81 @@ function renderProjects(){
       </div>
     `;
   }).join('') || '<div class="empty-state">لا توجد مشاريع</div>';
+
+  grid.querySelectorAll('[data-pid]').forEach(card => {
+    card.addEventListener('click', () => openProjectModal(card.dataset.pid));
+  });
 }
+
+function openProjectModal(projectId){
+  editingProjectId = projectId || null;
+  document.getElementById('projectModalTitle').textContent = projectId ? 'تعديل المشروع' : 'إضافة مشروع';
+  document.getElementById('projectDeleteBtn').style.display = projectId ? 'inline-flex' : 'none';
+  let p = {dept:'',name:'',desc:'',resp:'',start:'',end:'',pct:null,status:'لم يبدأ',blocker:''};
+  if(projectId){
+    const found = projectsData.find(x => x.id === projectId);
+    if(found) p = found;
+  }
+  document.getElementById('p_dept').value = p.dept || '';
+  document.getElementById('p_name').value = p.name || '';
+  document.getElementById('p_desc').value = p.desc || '';
+  document.getElementById('p_resp').value = p.resp || '';
+  document.getElementById('p_start').value = guessISODate(p.start);
+  document.getElementById('p_end').value = guessISODate(p.end);
+  document.getElementById('p_pct').value = (typeof p.pct === 'number') ? p.pct : '';
+  document.getElementById('p_status').value = p.status || 'لم يبدأ';
+  document.getElementById('p_blocker').value = p.blocker || '';
+  document.getElementById('projectModalOverlay').classList.add('open');
+}
+function closeProjectModal(){
+  document.getElementById('projectModalOverlay').classList.remove('open');
+  editingProjectId = null;
+}
+async function saveProject(){
+  const name = document.getElementById('p_name').value.trim();
+  if(!name){ showToast('الرجاء إدخال اسم المشروع'); return; }
+  await ensureIdentity();
+  const pctVal = document.getElementById('p_pct').value.trim();
+  const payload = {
+    dept: document.getElementById('p_dept').value.trim(),
+    name,
+    desc: document.getElementById('p_desc').value.trim(),
+    resp: document.getElementById('p_resp').value.trim(),
+    start: document.getElementById('p_start').value.trim(),
+    end: document.getElementById('p_end').value.trim(),
+    pct: pctVal === '' ? null : Number(pctVal),
+    status: document.getElementById('p_status').value,
+    blocker: document.getElementById('p_blocker').value.trim(),
+  };
+  if(editingProjectId){
+    const idx = projectsData.findIndex(x => x.id === editingProjectId);
+    if(idx > -1) projectsData[idx] = {...projectsData[idx], ...payload};
+  } else {
+    projectsData.unshift({id: uid('proj'), ...payload});
+  }
+  await saveProjectsData();
+  closeProjectModal();
+  renderProjects();
+  showToast('تم الحفظ بنجاح');
+}
+async function deleteProject(){
+  if(!editingProjectId) return;
+  if(!confirm('هل تريد حذف هذا المشروع؟')) return;
+  projectsData = projectsData.filter(x => x.id !== editingProjectId);
+  await saveProjectsData();
+  closeProjectModal();
+  renderProjects();
+  showToast('تم الحذف');
+}
+
+document.getElementById('addProjectBtn').addEventListener('click', () => openProjectModal(null));
+document.getElementById('projectModalCloseBtn').addEventListener('click', closeProjectModal);
+document.getElementById('projectCancelBtn').addEventListener('click', closeProjectModal);
+document.getElementById('projectSaveBtn').addEventListener('click', saveProject);
+document.getElementById('projectDeleteBtn').addEventListener('click', deleteProject);
+document.getElementById('projectModalOverlay').addEventListener('click', (e) => {
+  if(e.target.id === 'projectModalOverlay') closeProjectModal();
+});
 
 /* ---------- Staff ---------- */
 function renderStaff(){
@@ -684,6 +865,91 @@ function renderStaff(){
     </div>
   `).join('') || '<div class="empty-state">لا توجد نتائج</div>';
 }
+
+/* ---------- Archive (per-department file library) ---------- */
+let archiveDeptId = null;
+
+function renderArchiveTabs(){
+  if(!archiveDeptId) archiveDeptId = SEED_DATA[0]?.id || null;
+  const el = document.getElementById('archiveDeptTabs');
+  el.innerHTML = SEED_DATA.map(d => `
+    <div class="tab ${d.id===archiveDeptId?'active':''}" data-adept="${d.id}">${escapeHtml(d.name)}</div>
+  `).join('');
+  el.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      archiveDeptId = tab.dataset.adept;
+      renderArchiveTabs();
+      renderArchiveList();
+    });
+  });
+  renderArchiveList();
+}
+
+async function renderArchiveList(){
+  const listEl = document.getElementById('archiveFileList');
+  listEl.innerHTML = '<div class="empty-state">جارٍ التحميل...</div>';
+  const files = (await storageGet('archive:' + archiveDeptId)) || [];
+  if(files.length === 0){
+    listEl.innerHTML = '<div class="empty-state">📁 لا توجد ملفات بعد لهذا القسم</div>';
+    return;
+  }
+  listEl.innerHTML = files.map(f => `
+    <div class="archive-item">
+      <div>
+        <div class="archive-item-name">📄 ${escapeHtml(f.name)}</div>
+        <div class="muted">${formatBytes(f.size)} · رفعه ${escapeHtml(f.uploadedBy||'غير معروف')} · ${escapeHtml(f.uploadedAt||'')}</div>
+      </div>
+      <div class="row-actions">
+        <button class="btn btn-ghost btn-sm" data-openarchive="${f.id}" data-fname="${escapeHtml(f.name)}" data-ftype="${escapeHtml(f.type||'')}">فتح</button>
+        <button class="btn btn-danger-ghost btn-sm" data-delarchive="${f.id}">حذف</button>
+      </div>
+    </div>
+  `).join('');
+  listEl.querySelectorAll('[data-openarchive]').forEach(btn => {
+    btn.addEventListener('click', () => openAttachment('archive-' + btn.dataset.openarchive, btn.dataset.fname, btn.dataset.ftype));
+  });
+  listEl.querySelectorAll('[data-delarchive]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      if(!confirm('هل تريد حذف هذا الملف؟')) return;
+      const fileId = btn.dataset.delarchive;
+      await storageDelete('attach:archive-' + fileId);
+      const current = (await storageGet('archive:' + archiveDeptId)) || [];
+      await storageSet('archive:' + archiveDeptId, current.filter(x => x.id !== fileId));
+      renderArchiveList();
+      showToast('تم حذف الملف');
+    });
+  });
+}
+
+document.getElementById('archiveFileInput').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if(!file) return;
+  if(file.size > MAX_ATTACH_BYTES){
+    showToast('الملف كبير جدًا (' + formatBytes(file.size) + '). الحد الأقصى ' + formatBytes(MAX_ATTACH_BYTES));
+    e.target.value = '';
+    return;
+  }
+  await ensureIdentity();
+  showToast('جارٍ رفع الملف...');
+  try{
+    const dataBase64 = await readFileAsBase64(file);
+    const fileId = uid('arc');
+    await storageSet('attach:archive-' + fileId, { name: file.name, type: file.type, dataBase64 });
+    const current = (await storageGet('archive:' + archiveDeptId)) || [];
+    current.unshift({
+      id: fileId, name: file.name, type: file.type, size: file.size,
+      uploadedBy: currentUserName || 'غير معروف',
+      uploadedAt: new Date().toLocaleString('ar-SA', {dateStyle:'medium', timeStyle:'short'}),
+    });
+    await storageSet('archive:' + archiveDeptId, current);
+    e.target.value = '';
+    renderArchiveList();
+    showToast('تم رفع الملف بنجاح');
+  }catch(err){
+    console.error(err);
+    showToast('تعذر رفع الملف');
+  }
+});
 
 
 const STATUS_STYLE = {
@@ -799,9 +1065,8 @@ async function loadIdentity(){
 function renderIdentityBar(){
   const el = document.getElementById('lastSyncLabel');
   if(!el) return;
-  const base = '🟢 تحديث تلقائي كل 20 ثانية';
   if(currentUserName){
-    el.innerHTML = base + ' · أنت: <strong>' + escapeHtml(currentUserName) + '</strong> <button class="identity-link" id="changeNameBtn">(تغيير)</button>';
+    el.innerHTML = 'أنت: <strong>' + escapeHtml(currentUserName) + '</strong> <button class="identity-link" id="changeNameBtn">(تغيير)</button>';
     const changeBtn = document.getElementById('changeNameBtn');
     if(changeBtn) changeBtn.addEventListener('click', async () => {
       currentUserName = '';
@@ -809,7 +1074,7 @@ function renderIdentityBar(){
       renderIdentityBar();
     });
   } else {
-    el.textContent = base;
+    el.textContent = '';
   }
 }
 
