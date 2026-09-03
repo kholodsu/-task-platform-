@@ -140,6 +140,22 @@
   .org-name{font-weight:800; color:var(--blue-700); font-size:12.5px;}
   .org-role{font-size:11px; color:var(--gray-500); margin-top:3px; font-weight:500;}
 
+  .highlight-clickable{cursor:pointer; transition:transform .15s ease, box-shadow .15s ease;}
+  .highlight-clickable:hover{transform:translateY(-2px); box-shadow:var(--shadow-md);}
+  .highlight-more{margin-top:10px; font-size:11.5px; font-weight:800; color:var(--blue-600);}
+
+  /* modal */
+  .modal-overlay{
+    position:fixed; inset:0; background:rgba(6,31,51,0.35); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
+    display:none; align-items:center; justify-content:center; z-index:50; padding:20px;
+  }
+  .modal-overlay.open{display:flex;}
+  .modal{background:var(--glass-bg-strong); backdrop-filter:var(--glass-blur); -webkit-backdrop-filter:var(--glass-blur); border-radius:var(--radius-lg); width:100%; max-width:560px; max-height:85vh; overflow-y:auto; box-shadow:var(--shadow-md); border:1px solid var(--glass-border);}
+  .modal-head{padding:20px 24px; border-bottom:1px solid rgba(214,221,227,0.4); display:flex; align-items:center; justify-content:space-between;}
+  .modal-head h3{margin:0; font-size:16px; color:var(--blue-700);}
+  .modal-close{background:none; border:none; font-size:20px; cursor:pointer; color:var(--gray-500);}
+  .modal-body{padding:20px 24px;}
+
   @media (max-width:760px){
     .card{padding:16px 14px;}
   }
@@ -164,6 +180,16 @@
     <div id="deptContent"></div>
   </div>
 
+  <div class="modal-overlay" id="highlightModalOverlay">
+    <div class="modal">
+      <div class="modal-head">
+        <h3 id="highlightModalTitle">التفاصيل</h3>
+        <button class="modal-close" id="highlightModalCloseBtn">✕</button>
+      </div>
+      <div class="modal-body" id="highlightModalBody"></div>
+    </div>
+  </div>
+
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
 <script>
@@ -180,7 +206,7 @@ const LAB_EQUIPMENT = [{"facility": "مجمع إرادة والصحة النفس
 const WORKFORCE_FINAL = {"labs": [{"facility": "برج الشمال الطبي", "value": 27.0}, {"facility": "الأمير عبدالعزيز بن مساعد", "value": 21.0}, {"facility": "مركز القلب بعرعر", "value": 13.0}, {"facility": "النساء والولادة بعرعر", "value": 26.0}, {"facility": "مجمع إرادة والصحة النفسية", "value": 7.0}, {"facility": "جديدة عرعر", "value": 6.0}, {"facility": "الرعاية المديدة", "value": 3.0}, {"facility": "الولادة والأطفال برفحاء", "value": 6.0}, {"facility": "رفحاء العام", "value": 12.0}, {"facility": "الشعبة العام", "value": 6.0}, {"facility": "العويقيلة العام", "value": 7.0}, {"facility": "طريف العام", "value": 31.0}], "radiology": [{"facility": "برج الشمال الطبي", "value": 9.0}, {"facility": "الأمير عبدالعزيز بن مساعد", "value": 8.0}, {"facility": "مركز القلب بعرعر", "value": 2.0}, {"facility": "النساء والولادة بعرعر", "value": 10.0}, {"facility": "مجمع إرادة والصحة النفسية", "value": 2.0}, {"facility": "جديدة عرعر", "value": 1.0}, {"facility": "الرعاية المديدة", "value": 4.0}, {"facility": "الولادة والأطفال برفحاء", "value": 11.0}, {"facility": "رفحاء العام", "value": 23.0}, {"facility": "الشعبة العام", "value": 6.0}, {"facility": "العويقيلة العام", "value": 5.0}, {"facility": "طريف العام", "value": 12.0}], "pharmacy": [{"facility": "برج الشمال الطبي", "value": 27.0}, {"facility": "الأمير عبدالعزيز بن مساعد", "value": 19.0}, {"facility": "مركز القلب بعرعر", "value": 6.0}, {"facility": "النساء والولادة بعرعر", "value": 18.0}, {"facility": "مجمع إرادة والصحة النفسية", "value": 9.0}, {"facility": "جديدة عرعر", "value": 8.0}, {"facility": "الرعاية المديدة", "value": 5.0}, {"facility": "الولادة والأطفال برفحاء", "value": 12.0}, {"facility": "رفحاء العام", "value": 18.0}, {"facility": "الشعبة العام", "value": 4.0}, {"facility": "العويقيلة العام", "value": 12.0}, {"facility": "طريف العام", "value": 19.0}], "nutrition": [{"facility": "برج الشمال الطبي", "value": 2.0}, {"facility": "الأمير عبدالعزيز بن مساعد", "value": 1.0}, {"facility": "مركز القلب بعرعر", "value": 0}, {"facility": "النساء والولادة بعرعر", "value": 2.0}, {"facility": "مجمع إرادة والصحة النفسية", "value": 2.0}, {"facility": "جديدة عرعر", "value": 0}, {"facility": "الرعاية المديدة", "value": 0}, {"facility": "الولادة والأطفال برفحاء", "value": 1.0}, {"facility": "رفحاء العام", "value": 3.0}, {"facility": "الشعبة العام", "value": 1.0}, {"facility": "العويقيلة العام", "value": 0}, {"facility": "طريف العام", "value": 0}], "rehab": [{"facility": "برج الشمال الطبي", "value": 21.0}, {"facility": "الأمير عبدالعزيز بن مساعد", "value": 0}, {"facility": "مركز القلب بعرعر", "value": 0}, {"facility": "النساء والولادة بعرعر", "value": 7.0}, {"facility": "مجمع إرادة والصحة النفسية", "value": 0}, {"facility": "جديدة عرعر", "value": 0}, {"facility": "الرعاية المديدة", "value": 4.0}, {"facility": "الولادة والأطفال برفحاء", "value": 5.0}, {"facility": "رفحاء العام", "value": 11.0}, {"facility": "الشعبة العام", "value": 2.0}, {"facility": "العويقيلة العام", "value": 2.0}, {"facility": "طريف العام", "value": 11.0}], "mental": [{"facility": "برج الشمال الطبي", "value": 4.0}, {"facility": "الأمير عبدالعزيز بن مساعد", "value": 1.0}, {"facility": "مركز القلب بعرعر", "value": 3.0}, {"facility": "النساء والولادة بعرعر", "value": 3.0}, {"facility": "مجمع إرادة والصحة النفسية", "value": 17.0}, {"facility": "جديدة عرعر", "value": 0}, {"facility": "الرعاية المديدة", "value": 3.0}, {"facility": "الولادة والأطفال برفحاء", "value": 0}, {"facility": "رفحاء العام", "value": 6.0}, {"facility": "الشعبة العام", "value": 0}, {"facility": "العويقيلة العام", "value": 1.0}, {"facility": "طريف العام", "value": 1.0}]};
 const DEPARTMENT_HIGHLIGHTS = {"labs": [{"title": "مشروع عينتي", "summary": "ربط مختبرات مراكز الرعاية الصحية الأولية بمختبرات المستشفيات لمركزة الفحوصات وتحسين الخدمات المخبرية المقدمة للمستفيد."}, {"title": "تحسين بيئة العمل", "summary": "في مختبر برج الشمال الطبي، ومختبر مستشفى طريف العام، ومختبر مستشفى النساء والولادة بعرعر."}, {"title": "تشغيل المختبر الآلي بمستشفى النساء والولادة بعرعر", "summary": "دقة عالية تصل إلى 1200 عينة في الساعة، بالتعاون مع شركة بيكمان كولتر."}, {"title": "توسّع نطاق الخدمة بالمختبر الإقليمي", "summary": "نمو من 367 فحص عام 2023 إلى 847 فحص عام 2025."}, {"title": "فحوصات مستحدثة 2024", "summary": "Fecal Calprotectin (التهاب القولون)، QuantiFERON TB Gold (السل الكامن)، فحوصات الحساسية بتقنية Immunoblot."}, {"title": "فحوصات مستحدثة 2025", "summary": "فحوصات مناعة وأمصال إضافية: ANA/ANCA/EMA، تأكيد الزهري، تأكيد HIV، الحصبة والنكاف (IgM)."}], "pharmacy": [{"title": "البريد الدوائي", "summary": "1,825 شحنة بالنصف الأول من 2026 مقابل 1,620 بنفس الفترة من 2025 — نمو 112.65% على مستوى التجمع.", "table": {"headers": ["المنشأة", "الحالة", "شحنات 2025 (ن1)", "شحنات 2026 (ن1)", "الأداء"], "rows": [["مستشفى برج الشمال الطبي", "مفعّل", "300", "290", "96.7% (جيد جدًا)"], ["مستشفى الأمير عبدالعزيز بن مساعد", "مفعّل", "912", "550", "60.3% (يحتاج تحسين)"], ["مستشفى النساء والولادة والأطفال بعرعر", "مفعّل", "0", "شحنة واحدة", "متعثر"], ["مستشفى إرادة والصحة النفسية", "مفعّل", "10", "136", "1360% (ممتاز)"], ["مستشفى الرعاية المديدة", "مفعّل", "217", "145", "66.8% (يحتاج تحسين)"], ["مركز الأمير عبدالله لطب وجراحة القلب", "مفعّل", "170", "696", "409% (ممتاز)"], ["مستشفى رفحاء المركزي", "مفعّل", "6", "0", "يحتاج تحسين"], ["مستشفى طريف العام", "مفعّل", "10", "2", "20% (متعثر)"]]}}, {"title": "غرفة المحاليل الوريدية", "summary": "متطلبات التشغيل: غرفة معقمة بمعايير عالمية، نظام تدفق هواء أحادي الاتجاه ISO Class 5، ضغط إيجابي، ضبط حرارة ورطوبة، طاقم صيدلاني مدرب (يفضّل إكلينيكي). خطة التفعيل على 5 مراحل، بالأولوية لمنطقة عرعر (برج الشمال، الأمير عبدالعزيز، النساء والولادة) ثم رفحاء ثم طريف."}, {"title": "عقد تغذية وريدية للأطفال الخدج", "summary": "مع شركة خارجية متخصصة لمستشفى طريف العام ومستشفى النساء والولادة والأطفال برفحاء — 4 مستفيدين و37 طلب تغذية وريدية حتى نهاية 2025."}, {"title": "تكويد الأدوية بالاسم العلمي والتجاري", "summary": "أكثر من 6,500 بند دوائي، تنفيذ خلال مدة قياسية ابتداءً من يوليو 2025، دعمًا للتحول الرقمي وتوحيد البيانات الدوائية."}, {"title": "خدمة الاستفسارات الدوائية", "summary": "تسهّل وصول المستفيدين للصيدلي المختص للإجابة عن الأسئلة الدوائية بخصوصية عالية، مع بناء قاعدة بيانات مرجعية بالاستفسارات."}], "radiology": [{"title": "مبادرة \"رايتك وردية\"", "summary": "مبادرة مسائية للكشف المبكر عن سرطان الثدي بالماموغرام، بالتعاون مع جمعية حياة لسرطان الثدي بالحدود الشمالية."}, {"title": "المركز الأول بالمؤشر الوزاري", "summary": "تحقيق المركز الأول بمؤشر الكشف المبكر لسرطان الثدي لسنتين متتاليتين."}, {"title": "القافلة الصحية المتنقلة", "summary": "المشاركة في العيادة المتنقلة للكشف المبكر عن سرطان الثدي في القرى والهجر."}], "nutrition": [{"title": "استقرار عقود التغذية بالكامل", "summary": "ترسية 5 عقود جديدة خلال 2025 (شركة الخليج، صالح هادي آل حيدر، مجموعة الهناء التجارية ×2) — انتقال من مخاطر تعثر الخدمة إلى تشغيل فعلي دون انقطاع لكل المستشفيات."}, {"title": "الخطة التطويرية 2026", "summary": "استراتيجية على 3 محاور: التميز التشغيلي (توحيد الإجراءات)، التحول الرقمي (أتمتة ومؤشرات أداء)، والابتكار وتجربة المستفيد."}, {"title": "إنجازات الربع الأول 2026", "summary": "إتمام الزيارات التفقدية لكل الأقسام (100%)، إنشاء داشبورد قسم التغذية (100%)، تصميم مؤشر رفع المستخلصات الشهرية (100%)، إقفال 90% من مستخلصات 2025 المتعثرة."}], "rehab": [{"title": "مركز التأهيل الطبي الجديد بعرعر", "summary": "تشغيل المرحلة الأولى بقيمة تجهيزات تتجاوز 9 مليون ريال، تشغيل تجريبي أغسطس 2025، ويشمل 4 تخصصات: الطب الطبيعي، العلاج الطبيعي، العلاج الوظيفي، والأطراف الصناعية."}, {"title": "تفعيل أسرّة الرعاية المديدة للأطفال", "summary": "4 أسرّة بمستشفى النساء والأطفال بعرعر لرعاية الحالات المزمنة والمعقدة التي تتطلب إقامة طويلة."}, {"title": "تفعيل مسار السكتات الدماغية", "summary": "وتعميمه على جميع منشآت التجمع."}, {"title": "تفعيل مسار الأطراف الصناعية", "summary": "وتحسين معايير الوصول الشامل للأشخاص ذوي الإعاقة بالمستشفيات."}, {"title": "أعلى نسبة رضا على مستوى التجمعات الصحية", "summary": "تحقيق أعلى نسبة رضا لأقسام التأهيل مقارنة ببقية التجمعات الصحية."}, {"title": "مشروع عيادة النطق والتخاطب الافتراضية", "summary": "مرحلة تجريبية بمستشفى برج الشمال الطبي لمرضى 18+ سنة، بالتوسع تدريجيًا عبر 4 مراحل حتى تغطية جميع منشآت التجمع — يهدف لتحسين الوصول للخدمة وتقليل وقت الانتظار."}], "mental": [{"title": "تهيئة الأجنحة النفسية بالمستشفيات العامة", "summary": "وتفعيل العيادات النفسية ودمج الخدمات النفسية والاجتماعية بالمستشفيات والمراكز الصحية."}, {"title": "مبادرة \"طمنا عليك يا غالي\"", "summary": "بمجمع إرادة للصحة النفسية، لخفض معدلات الانتكاسة عبر تعزيز المتابعة بعد الخروج من التنويم."}, {"title": "تفعيل مسار الأطفال ذوي الظروف الخاصة", "summary": "يشمل الأطفال مجهولي الأبوين، وتوحيد آليات التنسيق بين المستشفيات ودور الرعاية."}, {"title": "تفعيل عيادات الإدمان", "summary": "بمستشفى طريف ورفحاء والعويقيلة."}, {"title": "تفعيل عيادة الاحتراق الوظيفي", "summary": "بأربع مستشفيات: برج الشمال الطبي، رفحاء العام، العويقيلة، مجمع إرادة والصحة النفسية."}, {"title": "تفعيل اللجنة النفسية الجنائية", "summary": "بتجمع الحدود الشمالية، تخفيفًا لمرضى منطقة الحدود الشمالية ومنطقة الجوف."}]};
 const SETTLEMENTS_DASHBOARD = {"months": ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"], "hospitals": [{"name": "مجمع إرادة للصحة النفسية", "statuses": ["", "تم", "تم", "تم", "تم", "لم يتم", "لم يتم", "لم يتم", "لم يتم", "لم يتم", "لم يتم", "لم يتم"]}, {"name": "مستشفى النساء والولادة - عرعر", "statuses": ["تم", "تم", "تم", "تم", "تم", "تم", "لم يتم", "لم يتم", "لم يتم", "لم يتم", "لم يتم", "لم يتم"]}, {"name": "مستشفى جديدة", "statuses": ["تم", "تم", "تم", "تم", "تم", "تم", "لم يتم", "لم يتم", "لم يتم", "لم يتم", "لم يتم", "لم يتم"]}, {"name": "مستشفى الأمير عبدالعزيز بن مساعد", "statuses": ["لم يتم", "لم يتم", "لم يتم", "لم يتم", "لم يتم", "لم يتم", "لم يتم", "لم يتم", "لم يتم", "لم يتم", "لم يتم", "لم يتم"]}, {"name": "مستشفى برج الشمال الطبي", "statuses": ["تم", "تم", "تم", "تم", "تم", "لم يتم", "لم يتم", "لم يتم", "لم يتم", "لم يتم", "لم يتم", "لم يتم"]}, {"name": "مستشفى العويقيلة", "statuses": ["تم", "تم", "تم", "تم", "تم", "لم يتم", "لم يتم", "لم يتم", "لم يتم", "لم يتم", "لم يتم", ""]}, {"name": "مستشفى الشعبة", "statuses": ["تم", "تم", "تم", "تم", "تم", "لم يتم", "لم يتم", "لم يتم", "لم يتم", "لم يتم", "لم يتم", "لم يتم"]}, {"name": "مستشفى طريف", "statuses": ["تم", "تم", "تم", "تم", "تم", "تم", "لم يتم", "لم يتم", "لم يتم", "لم يتم", "لم يتم", "لم يتم"]}, {"name": "مستشفى رفحاء العام", "statuses": ["تم", "تم", "تم", "تم", "تم", "تم", "لم يتم", "لم يتم", "لم يتم", "لم يتم", "لم يتم", "لم يتم"]}, {"name": "مستشفى النساء والولادة - رفحاء", "statuses": ["تم", "تم", "تم", "تم", "تم", "تم", "لم يتم", "لم يتم", "لم يتم", "لم يتم", "لم يتم", "لم يتم"]}]};
-const NUTRITION_ORG_CHART = {"ceo": "أ/ مروان اليحيى — الرئيس التنفيذي لتجمع الحدود الشمالية الصحي", "deputy": "د/ راكان الشعلان — نائب الرئيس التنفيذي لتقديم الرعاية الصحية", "supportDirector": "أ/ هاني زبن العنزي — مدير إدارة الخدمات الصحية المساندة", "nutritionDirector": "أ/ خيرية المليحان — مدير إدارة التغذية بالتجمع", "sectionHeads": [{"name": "عامر العنزي", "facility": "مستشفى برج الشمال الطبي"}, {"name": "نورة العجمي", "facility": "مستشفى الأمير عبدالعزيز بن مساعد"}, {"name": "عبدالله الصايغ", "facility": "مستشفى النساء والولادة بعرعر"}, {"name": "مشعل الرويلي", "facility": "مستشفى رفحاء العام"}, {"name": "فايز رشيد العنزي", "facility": "مستشفى النساء والولادة والأطفال برفحاء"}, {"name": "ممدوح الطرقي الرويلي", "facility": "مستشفى طريف"}, {"name": "سعدون البناقي", "facility": "مستشفى العويقيلة العام"}, {"name": "أيمن عبدرب الرسول", "facility": "مستشفى شعبة نصاب"}, {"name": "نوير الشمري", "facility": "مجمع إرادة"}]};
+const DEPT_ORG_CHARTS = {"labs": {"chain": ["الرئيس التنفيذي لتجمع الحدود الشمالية الصحي", "نائب الرئيس التنفيذي لتقديم الرعاية الصحية", "مدير إدارة الخدمات الصحية المساندة", "رئيس قسم المختبرات"], "facilities": ["برج الشمال الطبي", "الأمير عبدالعزيز بن مساعد", "مركز القلب بعرعر", "النساء والولادة بعرعر", "مجمع إرادة والصحة النفسية", "جديدة عرعر", "الرعاية المديدة", "الولادة والأطفال برفحاء", "رفحاء العام", "الشعبة العام", "العويقيلة العام", "طريف العام"]}, "radiology": {"chain": ["الرئيس التنفيذي لتجمع الحدود الشمالية الصحي", "نائب الرئيس التنفيذي لتقديم الرعاية الصحية", "مدير إدارة الخدمات الصحية المساندة", "رئيس قسم الأشعة"], "facilities": ["برج الشمال الطبي", "الأمير عبدالعزيز بن مساعد", "مركز القلب بعرعر", "النساء والولادة بعرعر", "جديدة عرعر", "الرعاية المديدة", "الولادة والأطفال برفحاء", "رفحاء العام", "الشعبة العام", "العويقيلة العام", "طريف العام"]}, "pharmacy": {"chain": ["الرئيس التنفيذي لتجمع الحدود الشمالية الصحي", "نائب الرئيس التنفيذي لتقديم الرعاية الصحية", "مدير إدارة الخدمات الصحية المساندة", "رئيس قسم الرعاية الصيدلانية"], "facilities": ["برج الشمال الطبي", "الأمير عبدالعزيز بن مساعد", "مركز القلب بعرعر", "النساء والولادة بعرعر", "مجمع إرادة والصحة النفسية", "جديدة عرعر", "الرعاية المديدة", "الولادة والأطفال برفحاء", "رفحاء العام", "الشعبة العام", "العويقيلة العام", "طريف العام"]}, "nutrition": {"chain": ["الرئيس التنفيذي لتجمع الحدود الشمالية الصحي", "نائب الرئيس التنفيذي لتقديم الرعاية الصحية", "مدير إدارة الخدمات الصحية المساندة", "مدير إدارة التغذية بالتجمع"], "facilities": ["برج الشمال الطبي", "الأمير عبدالعزيز بن مساعد", "النساء والولادة بعرعر", "رفحاء العام", "الولادة والأطفال برفحاء", "الشعبة العام", "طريف العام", "جديدة عرعر", "العويقيلة العام"]}, "rehab": {"chain": ["الرئيس التنفيذي لتجمع الحدود الشمالية الصحي", "نائب الرئيس التنفيذي لتقديم الرعاية الصحية", "مدير إدارة الخدمات الصحية المساندة", "رئيس قسم التأهيل الطبي"], "facilities": ["برج الشمال الطبي", "الرعاية المديدة", "رفحاء العام", "طريف العام", "العويقيلة العام", "الشعبة العام"]}, "mental": {"chain": ["الرئيس التنفيذي لتجمع الحدود الشمالية الصحي", "نائب الرئيس التنفيذي لتقديم الرعاية الصحية", "مدير إدارة الخدمات الصحية المساندة", "رئيس قسم الصحة النفسية والخدمة الاجتماعية"], "facilities": ["برج الشمال الطبي", "مجمع إرادة والصحة النفسية", "رفحاء العام", "الشعبة العام"]}};
 const RADIOLOGY_EQUIPMENT = {"columns": ["X-RAY Fixed", "X-RAY Mobile", "CT-Scan", "MRI System", "Bone denstometer", "Mamography", "U/S Imaging system", "U/S machine", "Cath LAB", "Brone breast biopsy", "C-ARM", "Fluroscopy", "X-RAY panoramic"], "rows": [{"facility": "برج الشمال الطبي", "values": [3, 4, 1, 1, 1, 1, null, 11, 1, null, 7, 1, null]}, {"facility": "مستشفى الامير عبدالعزيز بن مساعد", "values": [2, 3, 1, 1, null, 1, null, 1, null, 1, 3, 1, null]}, {"facility": "مركز الأمير عبدالله لطب وجراحة القلب", "values": [null, 3, 1, null, null, null, null, 8, 1, null, null, null, null]}, {"facility": "مستشفى النساء والولادة والأطفال بعرعر", "values": [4, 6, 1, 1, 1, 1, null, 18, null, null, null, 1, null]}, {"facility": "مستشفى رفحاء العام", "values": [4, 2, 1, 1, 1, 1, null, 9, null, null, 2, 1, null]}, {"facility": "مستشفى النساء والولادة والأطفال برفحاء", "values": [1, 4, 1, null, null, null, null, 8, null, null, null, null, null]}, {"facility": "مستشفى طريف العام", "values": [3, 5, 1, 1, null, 1, null, 12, null, null, 3, null, null]}, {"facility": "مجمع إرادة", "values": [1, 1, null, null, null, null, null, null, null, null, null, null, null]}, {"facility": "الرعاية المديدة", "values": [null, 1, null, null, null, null, null, 1, null, null, null, null, null]}, {"facility": "مستشفى جديدة عرعر", "values": [1, 1, 1, null, null, null, null, 3, null, null, null, 1, null]}, {"facility": "مستشفى العويقيلة العام", "values": [1, 2, 1, null, null, null, null, 7, null, null, null, 1, 1]}, {"facility": "مستشفى شعبة نصاب العام", "values": [1, 2, 1, null, null, null, null, 3, null, null, null, 1, null]}, {"facility": "مركز طب الاسنان التخصصي عرعر", "values": [null, null, null, null, null, null, null, null, null, null, null, null, 2]}, {"facility": "مركز طب الاسنان التخصصي رفحاء", "values": [null, null, null, null, null, null, null, null, null, null, null, null, 1]}, {"facility": "مركز طب الاسنان التخصصي طريف", "values": [null, null, null, null, null, null, null, null, null, null, null, null, 1]}, {"facility": "عربة الاشعة المتنقلة", "values": [null, 1, null, null, null, 1, null, 3, null, null, null, null, null]}, {"facility": "الرعاية الاولية", "values": [2, 4, null, null, null, null, null, 31, null, null, null, null, null]}]};
 
 const firebaseConfig = {
@@ -285,61 +311,73 @@ function renderSettlementsDashboard(){
   `;
 }
 
-function renderOrgChart(){
-  const d = NUTRITION_ORG_CHART;
-  const headsHtml = d.sectionHeads.map(h => `
+function renderOrgChart(deptId, deptName){
+  const d = DEPT_ORG_CHARTS[deptId];
+  if(!d) return '';
+  const chainHtml = d.chain.map((title, i) => `
+    <div class="org-level"><div class="org-box ${i < d.chain.length-1 ? 'org-top' : 'org-mid'}">${escapeHtml(title)}</div></div>
+    ${i < d.chain.length-1 ? '<div class="org-connector"></div>' : ''}
+  `).join('');
+  const leavesHtml = d.facilities.map(f => `
     <div class="org-box org-leaf">
-      <div class="org-name">${escapeHtml(h.name)}</div>
-      <div class="org-role">${escapeHtml(h.facility)}</div>
+      <div class="org-role">${escapeHtml(f)}</div>
     </div>
   `).join('');
   return `
     <div class="card">
-      <h3>🏢 الهيكل التنظيمي لإدارة التغذية</h3>
+      <h3>🏢 الهيكل التنظيمي — ${escapeHtml(deptName)}</h3>
       <div class="org-chart">
-        <div class="org-level"><div class="org-box org-top">${escapeHtml(d.ceo)}</div></div>
-        <div class="org-connector"></div>
-        <div class="org-level"><div class="org-box org-top">${escapeHtml(d.deputy)}</div></div>
-        <div class="org-connector"></div>
-        <div class="org-level"><div class="org-box org-mid">${escapeHtml(d.supportDirector)}</div></div>
-        <div class="org-connector"></div>
-        <div class="org-level"><div class="org-box org-mid">${escapeHtml(d.nutritionDirector)}</div></div>
+        ${chainHtml}
         <div class="org-connector org-connector-wide"></div>
-        <div class="org-leaves">${headsHtml}</div>
+        <div class="org-leaves">${leavesHtml}</div>
       </div>
     </div>
   `;
 }
 
+function truncateText(str, len){
+  if(str.length <= len) return str;
+  return str.slice(0, len).trim() + '…';
+}
+
 function renderHighlightsCard(deptId){
   const items = DEPARTMENT_HIGHLIGHTS[deptId];
   if(!items || items.length === 0) return '';
-  const cards = items.map(h => {
-    let tableHtml = '';
-    if(h.table){
-      tableHtml = `
-        <div class="mini-table-wrap">
-          <table>
-            <thead><tr>${h.table.headers.map(x=>`<th>${escapeHtml(x)}</th>`).join('')}</tr></thead>
-            <tbody>${h.table.rows.map(r => `<tr>${r.map(c=>`<td>${escapeHtml(c)}</td>`).join('')}</tr>`).join('')}</tbody>
-          </table>
-        </div>
-      `;
-    }
-    return `
-      <div class="highlight-item" style="${h.table ? 'grid-column:1/-1;' : ''}">
-        <h4>✦ ${escapeHtml(h.title)}</h4>
-        <p>${escapeHtml(h.summary)}</p>
-        ${tableHtml}
-      </div>
-    `;
-  }).join('');
+  const cards = items.map((h, idx) => `
+    <div class="highlight-item highlight-clickable" data-dept="${escapeHtml(deptId)}" data-idx="${idx}">
+      <h4>✦ ${escapeHtml(h.title)}</h4>
+      <p>${escapeHtml(truncateText(h.summary, 90))}</p>
+      <div class="highlight-more">عرض التفاصيل ←</div>
+    </div>
+  `).join('');
   return `
     <div class="card">
       <h3>🏆 خدمات ومنجزات القسم</h3>
       <div class="highlight-grid">${cards}</div>
     </div>
   `;
+}
+
+function openHighlightModal(deptId, idx){
+  const h = DEPARTMENT_HIGHLIGHTS[deptId][idx];
+  if(!h) return;
+  document.getElementById('highlightModalTitle').textContent = h.title;
+  let bodyHtml = `<p style="font-size:13.5px; line-height:1.8; color:var(--gray-700); margin:0;">${escapeHtml(h.summary)}</p>`;
+  if(h.table){
+    bodyHtml += `
+      <div class="mini-table-wrap" style="margin-top:16px;">
+        <table>
+          <thead><tr>${h.table.headers.map(x=>`<th>${escapeHtml(x)}</th>`).join('')}</tr></thead>
+          <tbody>${h.table.rows.map(r => `<tr>${r.map(c=>`<td>${escapeHtml(c)}</td>`).join('')}</tr>`).join('')}</tbody>
+        </table>
+      </div>
+    `;
+  }
+  document.getElementById('highlightModalBody').innerHTML = bodyHtml;
+  document.getElementById('highlightModalOverlay').classList.add('open');
+}
+function closeHighlightModal(){
+  document.getElementById('highlightModalOverlay').classList.remove('open');
 }
 
 function renderLabEquipmentCard(){
@@ -464,12 +502,16 @@ async function renderDeptContent(){
     </div>
     ${workforceCardForDept(dept)}
     ${renderHighlightsCard(dept.id)}
-    ${dept.id === 'nutrition' ? renderOrgChart() + renderSettlementsDashboard() : ''}
+    ${dept.id === 'nutrition' ? renderSettlementsDashboard() : ''}
+    ${renderOrgChart(dept.id, dept.name)}
     ${dept.hasEquipment === 'labs' ? renderLabEquipmentCard() : ''}
     ${dept.hasEquipment === 'radiology' ? renderRadiologyEquipmentCard() : ''}
     ${dept.hasEquipment === 'rehab' ? renderEquipmentPlaceholder(dept.name) : ''}
   `;
   wireLabEquipmentFilters();
+  el.querySelectorAll('.highlight-clickable').forEach(card => {
+    card.addEventListener('click', () => openHighlightModal(card.dataset.dept, parseInt(card.dataset.idx)));
+  });
 }
 
 async function init(){
@@ -477,6 +519,10 @@ async function init(){
   await renderDeptContent();
   workforceData = await loadWorkforce();
   renderDeptContent();
+  document.getElementById('highlightModalCloseBtn').addEventListener('click', closeHighlightModal);
+  document.getElementById('highlightModalOverlay').addEventListener('click', (e) => {
+    if(e.target.id === 'highlightModalOverlay') closeHighlightModal();
+  });
 }
 
 init();
