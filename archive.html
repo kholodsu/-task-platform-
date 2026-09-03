@@ -489,7 +489,8 @@ function renderEquipmentPlaceholder(deptName){
 function workforceCardForDept(dept){
   const items = WORKFORCE_FINAL[dept.id];
   if(!items) return '';
-  return renderBarChart('القوى العاملة — ' + dept.name, items);
+  const mapped = items.map(it => ({label: it.facility, value: it.value}));
+  return renderBarChart('القوى العاملة — ' + dept.name, mapped);
 }
 
 async function renderDeptContent(){
