@@ -99,10 +99,14 @@
 
   .device-count{font-size:12px; color:var(--gray-500); margin-bottom:10px;}
 
-  .highlight-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(280px,1fr)); gap:12px;}
-  .highlight-item{background:rgba(255,255,255,0.5); border:1px solid var(--glass-border); border-radius:16px; padding:16px 18px;}
-  .highlight-item h4{margin:0 0 6px; font-size:14px; color:var(--blue-700);}
-  .highlight-item p{margin:0; font-size:12.5px; color:var(--gray-700); line-height:1.6;}
+  .highlight-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(280px,1fr)); gap:14px;}
+  .highlight-item{
+    background:linear-gradient(135deg, rgba(255,255,255,0.65), rgba(255,255,255,0.4));
+    border:1px solid var(--glass-border); border-radius:18px; padding:18px 20px;
+    border-right:4px solid var(--blue-500); box-shadow:var(--shadow); transition:transform .15s ease;
+  }
+  .highlight-item h4{margin:0 0 8px; font-size:14.5px; color:var(--blue-700); font-weight:800;}
+  .highlight-item p{margin:0; font-size:12.5px; color:var(--gray-700); line-height:1.7;}
   .mini-table-wrap{margin-top:12px; overflow-x:auto; border-radius:12px; border:1px solid var(--glass-border);}
   .mini-table-wrap table{font-size:11.5px;}
   .region-total-badge{display:inline-flex; align-items:center; gap:6px; background:rgba(238,246,251,0.8); color:var(--blue-700); font-weight:800; padding:6px 14px; border-radius:999px; font-size:13px; margin-right:8px;}
@@ -189,121 +193,31 @@ function renderDeptNav(){
   });
 }
 
-function renderWorkforceCard(dept){
-  if(!workforceData){
-    return `<div class="card"><h3>👥 القوى العاملة</h3><div class="empty-note">جارٍ التحميل...</div></div>`;
+function renderBarChart(title, items, opts){
+  opts = opts || {};
+  const validItems = items.filter(it => typeof it.value === 'number');
+  if(validItems.length === 0){
+    return `<div class="card"><h3>👥 ${escapeHtml(title)}</h3><div class="empty-note">لا توجد بيانات</div></div>`;
   }
-  const hospitals = workforceData.hospitals;
-  const relevantRows = workforceData.rows.filter(r => dept.specialties.includes(r.specialty));
-  if(relevantRows.length === 0){
-    return `<div class="card"><h3>👥 القوى العاملة</h3><div class="empty-note">لا توجد بيانات قوى عاملة مطابقة لهذا القسم</div></div>`;
-  }
-  // sum across matched specialty rows per hospital
-  const current = hospitals.map((_, i) => relevantRows.reduce((sum, r) => sum + (typeof r.current[i] === 'number' ? r.current[i] : 0), 0));
-  const needed = hospitals.map((_, i) => relevantRows.reduce((sum, r) => sum + (typeof r.needed[i] === 'number' ? r.needed[i] : 0), 0));
-  const totalCurrent = current.reduce((a,b)=>a+b,0);
-  const totalNeeded = needed.reduce((a,b)=>a+b,0);
-
-  let rows = hospitals.map((h, i) => `
-    <tr><td>${escapeHtml(h)}</td><td>${current[i]}</td><td class="needed-col">${needed[i]}</td></tr>
-  `).join('');
-  rows += `<tr class="totals-row"><td>الإجمالي</td><td>${totalCurrent}</td><td class="needed-col">${totalNeeded}</td></tr>`;
-
+  const max = Math.max(...validItems.map(it => it.value), 1);
+  const total = validItems.reduce((a,b)=>a+b.value,0);
+  const rows = validItems
+    .slice()
+    .sort((a,b) => b.value - a.value)
+    .map(it => {
+      const pct = Math.max((it.value / max) * 100, it.value > 0 ? 6 : 0);
+      return `
+        <div class="bar-chart-row">
+          <div class="bar-label">${escapeHtml(it.label)}</div>
+          <div class="bar-track"><div class="bar-fill" style="width:${pct}%;"><span class="bar-value">${it.value}</span></div></div>
+        </div>
+      `;
+    }).join('');
   return `
     <div class="card">
-      <h3>👥 القوى العاملة — ${relevantRows.map(r=>escapeHtml(r.specialty)).join(' + ')}</h3>
-      <div class="table-scroll">
-        <table>
-          <thead><tr><th>المنشأة</th><th>الحالي</th><th class="needed-col">الاحتياج</th></tr></thead>
-          <tbody>${rows}</tbody>
-        </table>
-      </div>
-    </div>
-  `;
-}
-
-function renderOfficialWorkforceCard(title, data){
-  const rows = data.map(r => `
-    <tr>
-      <td>${escapeHtml(r.facility)}</td>
-      <td>${r.current === null || r.current === undefined ? '—' : r.current}</td>
-      <td class="needed-col">${r.need === null || r.need === undefined ? '—' : r.need}</td>
-      <td style="text-align:right; white-space:normal; font-size:12px; color:var(--gray-700); max-width:340px;">${escapeHtml(r.notes) || '—'}</td>
-    </tr>
-  `).join('');
-  const totalCurrent = data.reduce((a,r)=>a+(r.current||0),0);
-  const totalNeed = data.reduce((a,r)=>a+(r.need||0),0);
-  return `
-    <div class="card">
-      <h3>📋 ${escapeHtml(title)} (توزيع الوظائف، يناير 2026)</h3>
-      <div class="table-scroll">
-        <table>
-          <thead><tr><th>المنشأة</th><th>العدد الحالي</th><th class="needed-col">الاحتياج</th><th>المبررات</th></tr></thead>
-          <tbody>${rows}
-            <tr class="totals-row"><td>الإجمالي</td><td>${totalCurrent}</td><td class="needed-col">${totalNeed}</td><td></td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  `;
-}
-
-function renderNutritionOfficialCard(){
-  const rows = NUTRITION_OFFICIAL_WORKFORCE.map(r => `
-    <tr${r.uncertain ? ' style="opacity:0.6;"' : ''}>
-      <td>${escapeHtml(r.facility)}${r.uncertain ? ' ⚠️' : ''}</td>
-      <td>${r.gen_current === null || r.gen_current === undefined ? '—' : r.gen_current}</td>
-      <td class="needed-col">${r.gen_need === null || r.gen_need === undefined ? '—' : r.gen_need}</td>
-      <td>${r.ther_current === null || r.ther_current === undefined ? '—' : r.ther_current}</td>
-      <td class="needed-col">${r.ther_need === null || r.ther_need === undefined ? '—' : r.ther_need}</td>
-      <td style="text-align:right; white-space:normal; font-size:12px; color:var(--gray-700); max-width:280px;">${escapeHtml(r.notes) || '—'}</td>
-    </tr>
-  `).join('');
-  return `
-    <div class="card">
-      <h3>📋 القوى العاملة الرسمية — التغذية (توزيع الوظائف، يناير 2026)</h3>
-      <div class="empty-note" style="padding:8px 0 14px; text-align:right; font-size:12px;">⚠️ الصفوف المعلّمة كانت غامضة بالمستند الأصلي — يُنصح بمراجعتها يدويًا</div>
-      <div class="table-scroll">
-        <table>
-          <thead><tr><th>المنشأة</th><th colspan="2">تغذية عامة</th><th colspan="2" class="needed-col">تغذية علاجية</th><th>المبررات</th></tr>
-          <tr><th></th><th>الحالي</th><th class="needed-col">الاحتياج</th><th>الحالي</th><th class="needed-col">الاحتياج</th><th></th></tr></thead>
-          <tbody>${rows}</tbody>
-        </table>
-      </div>
-    </div>
-  `;
-}
-
-function renderRegionalWorkforceCard(deptId){
-  const entry = REGIONAL_WORKFORCE.data[deptId];
-  if(!entry) return '';
-  const regions = REGIONAL_WORKFORCE.regions;
-  let rowsData;
-  if(entry.rows){
-    rowsData = entry.rows;
-  } else {
-    rowsData = [{label: entry.label, values: entry.values}];
-  }
-  const grandTotal = rowsData.reduce((sum,r) => sum + r.values.reduce((a,b)=>a+b,0), 0);
-  const colTotals = regions.map((_, i) => rowsData.reduce((sum,r) => sum + r.values[i], 0));
-
-  let rowsHtml = rowsData.map(r => `
-    <tr><td>${escapeHtml(r.label)}</td>${r.values.map(v => `<td>${v}</td>`).join('')}<td style="font-weight:800; color:var(--blue-600);">${r.values.reduce((a,b)=>a+b,0)}</td></tr>
-  `).join('');
-  if(rowsData.length > 1){
-    rowsHtml += `<tr class="totals-row"><td>الإجمالي</td>${colTotals.map(v=>`<td>${v}</td>`).join('')}<td>${grandTotal}</td></tr>`;
-  }
-
-  return `
-    <div class="card">
-      <h3>👥 القوى العاملة — الإجمالي والتوزيع</h3>
-      <div style="margin-bottom:14px;"><span class="region-total-badge">📊 إجمالي المنسوبين: ${grandTotal}</span></div>
-      <div class="table-scroll">
-        <table>
-          <thead><tr><th>التخصص</th>${regions.map(r=>`<th>${escapeHtml(r)}</th>`).join('')}<th>الإجمالي</th></tr></thead>
-          <tbody>${rowsHtml}</tbody>
-        </table>
-      </div>
+      <h3>👥 ${escapeHtml(title)}</h3>
+      <div style="margin-bottom:16px;"><span class="region-total-badge">📊 الإجمالي: ${total}</span></div>
+      ${rows}
     </div>
   `;
 }
@@ -335,32 +249,6 @@ function renderHighlightsCard(deptId){
     <div class="card">
       <h3>🏆 خدمات ومنجزات القسم</h3>
       <div class="highlight-grid">${cards}</div>
-    </div>
-  `;
-}
-
-function renderLabOfficialWorkforceCard(){
-  const rows = LABS_OFFICIAL_WORKFORCE.map(r => `
-    <tr>
-      <td>${escapeHtml(r.facility)}</td>
-      <td>${r.current}</td>
-      <td class="needed-col">${r.need === null ? '—' : r.need}</td>
-      <td style="text-align:right; white-space:normal; font-size:12px; color:var(--gray-700); max-width:340px;">${escapeHtml(r.notes) || '—'}</td>
-    </tr>
-  `).join('');
-  const totalCurrent = LABS_OFFICIAL_WORKFORCE.reduce((a,r)=>a+r.current,0);
-  const totalNeed = LABS_OFFICIAL_WORKFORCE.reduce((a,r)=>a+(r.need||0),0);
-  return `
-    <div class="card">
-      <h3>📋 القوى العاملة الرسمية — المختبرات (توزيع الوظائف، يناير 2026)</h3>
-      <div class="table-scroll">
-        <table>
-          <thead><tr><th>المنشأة</th><th>العدد الحالي</th><th class="needed-col">الاحتياج</th><th>المبررات</th></tr></thead>
-          <tbody>${rows}
-            <tr class="totals-row"><td>الإجمالي</td><td>${totalCurrent}</td><td class="needed-col">${totalNeed}</td><td></td></tr>
-          </tbody>
-        </table>
-      </div>
     </div>
   `;
 }
@@ -471,6 +359,39 @@ function renderEquipmentPlaceholder(deptName){
   `;
 }
 
+function workforceCardForDept(dept){
+  // Prefer precise facility-level data (which separates "جديدة عرعر" from "عرعر")
+  // wherever we have it; fall back to the regional 5-group summary otherwise.
+  if(dept.id === 'labs'){
+    return renderBarChart('القوى العاملة — المختبرات', LABS_OFFICIAL_WORKFORCE.map(r => ({label:r.facility, value:r.current})));
+  }
+  if(dept.id === 'radiology'){
+    return renderBarChart('القوى العاملة — الأشعة', RADIOLOGY_OFFICIAL_WORKFORCE.map(r => ({label:r.facility, value:r.current})));
+  }
+  if(dept.id === 'nutrition'){
+    const items = NUTRITION_OFFICIAL_WORKFORCE.map(r => ({label:r.facility, value:(r.gen_current||0)+(r.ther_current||0)}));
+    return renderBarChart('القوى العاملة — التغذية (عامة + علاجية)', items);
+  }
+  if(dept.id === 'rehab'){
+    const respiratory = renderBarChart('القوى العاملة — العلاج التنفسي', RESPIRATORY_OFFICIAL_WORKFORCE.map(r => ({label:r.facility, value:r.current})));
+    const entry = REGIONAL_WORKFORCE.data['rehab'];
+    const regions = REGIONAL_WORKFORCE.regions;
+    const totalsByRegion = regions.map((_, i) => entry.rows.reduce((sum,r)=>sum+r.values[i],0));
+    const otherRehab = renderBarChart('القوى العاملة — الطب الطبيعي والعلاج الطبيعي والوظيفي والأطراف الصناعية',
+      regions.map((r,i) => ({label:r, value: totalsByRegion[i]})));
+    return otherRehab + respiratory;
+  }
+  // pharmacy, mental: only regional summary available
+  const entry = REGIONAL_WORKFORCE.data[dept.id];
+  if(!entry) return '';
+  const regions = REGIONAL_WORKFORCE.regions;
+  if(entry.rows){
+    const totalsByRegion = regions.map((_, i) => entry.rows.reduce((sum,r)=>sum+r.values[i],0));
+    return renderBarChart('القوى العاملة — ' + dept.name, regions.map((r,i) => ({label:r, value: totalsByRegion[i]})));
+  }
+  return renderBarChart('القوى العاملة — ' + dept.name, regions.map((r,i) => ({label:r, value: entry.values[i]})));
+}
+
 async function renderDeptContent(){
   const dept = DEPARTMENTS.find(d => d.id === activeDept);
   const el = document.getElementById('deptContent');
@@ -479,12 +400,7 @@ async function renderDeptContent(){
       <h2>${escapeHtml(dept.name)}</h2>
       <p>القوى العاملة${dept.hasEquipment ? ' والأجهزة' : ''} الخاصة بالقسم</p>
     </div>
-    ${renderRegionalWorkforceCard(dept.id)}
-    ${(dept.id === 'labs' || dept.id === 'radiology' || dept.id === 'nutrition') ? '' : renderWorkforceCard(dept)}
-    ${dept.id === 'labs' ? renderLabOfficialWorkforceCard() : ''}
-    ${dept.id === 'radiology' ? renderOfficialWorkforceCard('القوى العاملة الرسمية — الأشعة', RADIOLOGY_OFFICIAL_WORKFORCE) : ''}
-    ${dept.id === 'nutrition' ? renderNutritionOfficialCard() : ''}
-    ${dept.id === 'rehab' ? renderWorkforceCard(dept) + renderOfficialWorkforceCard('القوى العاملة الرسمية — العلاج التنفسي', RESPIRATORY_OFFICIAL_WORKFORCE) : ''}
+    ${workforceCardForDept(dept)}
     ${renderHighlightsCard(dept.id)}
     ${dept.hasEquipment === 'labs' ? renderLabEquipmentCard() : ''}
     ${dept.hasEquipment === 'radiology' ? renderRadiologyEquipmentCard() : ''}
