@@ -190,8 +190,6 @@
     </div>
   </div>
 
-<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
 <script>
 const DEPARTMENTS = [
   {id:'labs', name:'قسم المختبرات', icon:'🔬', accent:'#1b94d0', specialties:['المختبر'], hasEquipment:'labs'},
@@ -209,16 +207,20 @@ const SETTLEMENTS_DASHBOARD = {"months": ["يناير", "فبراير", "مار�
 const DEPT_ORG_CHARTS = {"labs": {"chain": ["الرئيس التنفيذي", "نائب الرئيس التنفيذي للخدمات الصحية", "مدير إدارة الخدمات الصحية المساندة", "رئيس قسم المختبرات"], "facilities": ["رئيس قسم مختبر — برج الشمال الطبي", "رئيس قسم مختبر — الأمير عبدالعزيز بن مساعد", "رئيس قسم مختبر — مركز القلب بعرعر", "رئيس قسم مختبر — النساء والولادة بعرعر", "رئيس قسم مختبر — مجمع إرادة والصحة النفسية", "رئيس قسم مختبر — جديدة عرعر", "رئيس قسم مختبر — الرعاية المديدة", "رئيس قسم مختبر — الولادة والأطفال برفحاء", "رئيس قسم مختبر — رفحاء العام", "رئيس قسم مختبر — الشعبة العام", "رئيس قسم مختبر — العويقيلة العام", "رئيس قسم مختبر — طريف العام"]}, "radiology": {"chain": ["الرئيس التنفيذي", "نائب الرئيس التنفيذي للخدمات الصحية", "مدير إدارة الخدمات الصحية المساندة", "رئيس قسم الأشعة"], "facilities": ["رئيس قسم أشعة — برج الشمال الطبي", "رئيس قسم أشعة — الأمير عبدالعزيز بن مساعد", "رئيس قسم أشعة — مركز القلب بعرعر", "رئيس قسم أشعة — النساء والولادة بعرعر", "رئيس قسم أشعة — جديدة عرعر", "رئيس قسم أشعة — الرعاية المديدة", "رئيس قسم أشعة — الولادة والأطفال برفحاء", "رئيس قسم أشعة — رفحاء العام", "رئيس قسم أشعة — الشعبة العام", "رئيس قسم أشعة — العويقيلة العام", "رئيس قسم أشعة — طريف العام"]}, "pharmacy": {"chain": ["الرئيس التنفيذي", "نائب الرئيس التنفيذي للخدمات الصحية", "مدير إدارة الخدمات الصحية المساندة", "رئيس قسم الرعاية الصيدلانية"], "facilities": ["رئيس قسم صيدلية — برج الشمال الطبي", "رئيس قسم صيدلية — الأمير عبدالعزيز بن مساعد", "رئيس قسم صيدلية — مركز القلب بعرعر", "رئيس قسم صيدلية — النساء والولادة بعرعر", "رئيس قسم صيدلية — مجمع إرادة والصحة النفسية", "رئيس قسم صيدلية — جديدة عرعر", "رئيس قسم صيدلية — الرعاية المديدة", "رئيس قسم صيدلية — الولادة والأطفال برفحاء", "رئيس قسم صيدلية — رفحاء العام", "رئيس قسم صيدلية — الشعبة العام", "رئيس قسم صيدلية — العويقيلة العام", "رئيس قسم صيدلية — طريف العام"]}, "nutrition": {"chain": ["الرئيس التنفيذي", "نائب الرئيس التنفيذي للخدمات الصحية", "مدير إدارة الخدمات الصحية المساندة", "رئيس قسم التغذية بالتجمع"], "facilities": ["برج الشمال الطبي", "الأمير عبدالعزيز بن مساعد", "النساء والولادة بعرعر", "رفحاء العام", "الولادة والأطفال برفحاء", "الشعبة العام", "طريف العام", "جديدة عرعر", "العويقيلة العام"]}, "rehab": {"chain": ["الرئيس التنفيذي", "نائب الرئيس التنفيذي للخدمات الصحية", "مدير إدارة الخدمات الصحية المساندة", "رئيس قسم التأهيل الطبي"], "facilities": ["رئيس قسم تأهيل طبي — برج الشمال الطبي", "رئيس قسم تأهيل طبي — الرعاية المديدة", "رئيس قسم تأهيل طبي — رفحاء العام", "رئيس قسم تأهيل طبي — طريف العام", "رئيس قسم تأهيل طبي — العويقيلة العام", "رئيس قسم تأهيل طبي — الشعبة العام"]}, "mental": {"chain": ["الرئيس التنفيذي", "نائب الرئيس التنفيذي للخدمات الصحية", "مدير إدارة الخدمات الصحية المساندة", "رئيس قسم الصحة النفسية والخدمة الاجتماعية"], "facilities": ["رئيس قسم الخدمة الاجتماعية والصحة النفسية — برج الشمال الطبي", "رئيس قسم الخدمة الاجتماعية والصحة النفسية — الأمير عبدالعزيز بن مساعد", "رئيس قسم الخدمة الاجتماعية والصحة النفسية — مركز القلب بعرعر", "رئيس قسم الخدمة الاجتماعية والصحة النفسية — النساء والولادة بعرعر", "رئيس قسم الخدمة الاجتماعية والصحة النفسية — مجمع إرادة والصحة النفسية", "رئيس قسم الخدمة الاجتماعية والصحة النفسية — جديدة عرعر", "رئيس قسم الخدمة الاجتماعية والصحة النفسية — الرعاية المديدة", "رئيس قسم الخدمة الاجتماعية والصحة النفسية — الولادة والأطفال برفحاء", "رئيس قسم الخدمة الاجتماعية والصحة النفسية — رفحاء العام", "رئيس قسم الخدمة الاجتماعية والصحة النفسية — الشعبة العام", "رئيس قسم الخدمة الاجتماعية والصحة النفسية — العويقيلة العام", "رئيس قسم الخدمة الاجتماعية والصحة النفسية — طريف العام"]}};
 const RADIOLOGY_DEVICES = [{"facility": "برج الشمال الطبي", "name": "X-RAY Fixed", "qty": 3}, {"facility": "برج الشمال الطبي", "name": "X-RAY Mobile", "qty": 4}, {"facility": "برج الشمال الطبي", "name": "CT-Scan", "qty": 1}, {"facility": "برج الشمال الطبي", "name": "MRI System", "qty": 1}, {"facility": "برج الشمال الطبي", "name": "Bone denstometer", "qty": 1}, {"facility": "برج الشمال الطبي", "name": "Mamography", "qty": 1}, {"facility": "برج الشمال الطبي", "name": "U/S machine", "qty": 11}, {"facility": "برج الشمال الطبي", "name": "Cath LAB", "qty": 1}, {"facility": "برج الشمال الطبي", "name": "C-ARM", "qty": 7}, {"facility": "برج الشمال الطبي", "name": "Fluroscopy", "qty": 1}, {"facility": "مستشفى الامير عبدالعزيز بن مساعد", "name": "X-RAY Fixed", "qty": 2}, {"facility": "مستشفى الامير عبدالعزيز بن مساعد", "name": "X-RAY Mobile", "qty": 3}, {"facility": "مستشفى الامير عبدالعزيز بن مساعد", "name": "CT-Scan", "qty": 1}, {"facility": "مستشفى الامير عبدالعزيز بن مساعد", "name": "MRI System", "qty": 1}, {"facility": "مستشفى الامير عبدالعزيز بن مساعد", "name": "Mamography", "qty": 1}, {"facility": "مستشفى الامير عبدالعزيز بن مساعد", "name": "U/S machine", "qty": 1}, {"facility": "مستشفى الامير عبدالعزيز بن مساعد", "name": "Brone breast biopsy", "qty": 1}, {"facility": "مستشفى الامير عبدالعزيز بن مساعد", "name": "C-ARM", "qty": 3}, {"facility": "مستشفى الامير عبدالعزيز بن مساعد", "name": "Fluroscopy", "qty": 1}, {"facility": "مركز الأمير عبدالله لطب وجراحة القلب", "name": "X-RAY Mobile", "qty": 3}, {"facility": "مركز الأمير عبدالله لطب وجراحة القلب", "name": "CT-Scan", "qty": 1}, {"facility": "مركز الأمير عبدالله لطب وجراحة القلب", "name": "U/S machine", "qty": 8}, {"facility": "مركز الأمير عبدالله لطب وجراحة القلب", "name": "Cath LAB", "qty": 1}, {"facility": "مستشفى النساء والولادة والأطفال بعرعر", "name": "X-RAY Fixed", "qty": 4}, {"facility": "مستشفى النساء والولادة والأطفال بعرعر", "name": "X-RAY Mobile", "qty": 6}, {"facility": "مستشفى النساء والولادة والأطفال بعرعر", "name": "CT-Scan", "qty": 1}, {"facility": "مستشفى النساء والولادة والأطفال بعرعر", "name": "MRI System", "qty": 1}, {"facility": "مستشفى النساء والولادة والأطفال بعرعر", "name": "Bone denstometer", "qty": 1}, {"facility": "مستشفى النساء والولادة والأطفال بعرعر", "name": "Mamography", "qty": 1}, {"facility": "مستشفى النساء والولادة والأطفال بعرعر", "name": "U/S machine", "qty": 18}, {"facility": "مستشفى النساء والولادة والأطفال بعرعر", "name": "Fluroscopy", "qty": 1}, {"facility": "مستشفى رفحاء العام", "name": "X-RAY Fixed", "qty": 4}, {"facility": "مستشفى رفحاء العام", "name": "X-RAY Mobile", "qty": 2}, {"facility": "مستشفى رفحاء العام", "name": "CT-Scan", "qty": 1}, {"facility": "مستشفى رفحاء العام", "name": "MRI System", "qty": 1}, {"facility": "مستشفى رفحاء العام", "name": "Bone denstometer", "qty": 1}, {"facility": "مستشفى رفحاء العام", "name": "Mamography", "qty": 1}, {"facility": "مستشفى رفحاء العام", "name": "U/S machine", "qty": 9}, {"facility": "مستشفى رفحاء العام", "name": "C-ARM", "qty": 2}, {"facility": "مستشفى رفحاء العام", "name": "Fluroscopy", "qty": 1}, {"facility": "مستشفى النساء والولادة والأطفال برفحاء", "name": "X-RAY Fixed", "qty": 1}, {"facility": "مستشفى النساء والولادة والأطفال برفحاء", "name": "X-RAY Mobile", "qty": 4}, {"facility": "مستشفى النساء والولادة والأطفال برفحاء", "name": "CT-Scan", "qty": 1}, {"facility": "مستشفى النساء والولادة والأطفال برفحاء", "name": "U/S machine", "qty": 8}, {"facility": "مستشفى طريف العام", "name": "X-RAY Fixed", "qty": 3}, {"facility": "مستشفى طريف العام", "name": "X-RAY Mobile", "qty": 5}, {"facility": "مستشفى طريف العام", "name": "CT-Scan", "qty": 1}, {"facility": "مستشفى طريف العام", "name": "MRI System", "qty": 1}, {"facility": "مستشفى طريف العام", "name": "Mamography", "qty": 1}, {"facility": "مستشفى طريف العام", "name": "U/S machine", "qty": 12}, {"facility": "مستشفى طريف العام", "name": "C-ARM", "qty": 3}, {"facility": "مجمع إرادة", "name": "X-RAY Fixed", "qty": 1}, {"facility": "مجمع إرادة", "name": "X-RAY Mobile", "qty": 1}, {"facility": "الرعاية المديدة", "name": "X-RAY Mobile", "qty": 1}, {"facility": "الرعاية المديدة", "name": "U/S machine", "qty": 1}, {"facility": "مستشفى جديدة عرعر", "name": "X-RAY Fixed", "qty": 1}, {"facility": "مستشفى جديدة عرعر", "name": "X-RAY Mobile", "qty": 1}, {"facility": "مستشفى جديدة عرعر", "name": "CT-Scan", "qty": 1}, {"facility": "مستشفى جديدة عرعر", "name": "U/S machine", "qty": 3}, {"facility": "مستشفى جديدة عرعر", "name": "Fluroscopy", "qty": 1}, {"facility": "مستشفى العويقيلة العام", "name": "X-RAY Fixed", "qty": 1}, {"facility": "مستشفى العويقيلة العام", "name": "X-RAY Mobile", "qty": 2}, {"facility": "مستشفى العويقيلة العام", "name": "CT-Scan", "qty": 1}, {"facility": "مستشفى العويقيلة العام", "name": "U/S machine", "qty": 7}, {"facility": "مستشفى العويقيلة العام", "name": "Fluroscopy", "qty": 1}, {"facility": "مستشفى العويقيلة العام", "name": "X-RAY panoramic", "qty": 1}, {"facility": "مستشفى شعبة نصاب العام", "name": "X-RAY Fixed", "qty": 1}, {"facility": "مستشفى شعبة نصاب العام", "name": "X-RAY Mobile", "qty": 2}, {"facility": "مستشفى شعبة نصاب العام", "name": "CT-Scan", "qty": 1}, {"facility": "مستشفى شعبة نصاب العام", "name": "U/S machine", "qty": 3}, {"facility": "مستشفى شعبة نصاب العام", "name": "Fluroscopy", "qty": 1}, {"facility": "مركز طب الاسنان التخصصي عرعر", "name": "X-RAY panoramic", "qty": 2}, {"facility": "مركز طب الاسنان التخصصي رفحاء", "name": "X-RAY panoramic", "qty": 1}, {"facility": "مركز طب الاسنان التخصصي طريف", "name": "X-RAY panoramic", "qty": 1}, {"facility": "عربة الاشعة المتنقلة", "name": "X-RAY Mobile", "qty": 1}, {"facility": "عربة الاشعة المتنقلة", "name": "Mamography", "qty": 1}, {"facility": "عربة الاشعة المتنقلة", "name": "U/S machine", "qty": 3}, {"facility": "الرعاية الاولية", "name": "X-RAY Fixed", "qty": 2}, {"facility": "الرعاية الاولية", "name": "X-RAY Mobile", "qty": 4}, {"facility": "الرعاية الاولية", "name": "U/S machine", "qty": 31}];
 
-const firebaseConfig = {
-  apiKey: "AIzaSyD6Tvs0JvHRZ2ck3GWxWoDYARWMmcxjdh4",
-  authDomain: "task-platform-690d3.firebaseapp.com",
-  projectId: "task-platform-690d3",
-  storageBucket: "task-platform-690d3.firebasestorage.app",
-  messagingSenderId: "545861396779",
-  appId: "1:545861396779:web:8f5753092c527a6b4ffd6e",
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
+/* Shared data lives in a private GitHub repo (Firestore is unreachable here).
+   This page only ever reads. */
+const GH_OWNER = 'kholodsu';
+const GH_REPO  = 'platform-data.';
+const GH_FILE  = 'data.json';
+const GH_TOKEN = atob('Z2l0aHViX3BhdF8xMUNNWEtZMkEwalBMWGttM1JRRFZ5X1dteHJkUnJPV3RGTjZCRk5FZ254WlNLQURBVFJjeUl5cThLcHhLZ011RGZIWDRHN1hFSmx6SGRrYlZB');
+const GH_API   = 'https://api.github.com/repos/' + GH_OWNER + '/' + GH_REPO + '/contents/' + GH_FILE;
+
+function b64DecodeUnicode(b64){
+  const bin = atob(String(b64).replace(/\s/g, ''));
+  const bytes = new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) bytes[i] = bin.charCodeAt(i);
+  return new TextDecoder('utf-8').decode(bytes);
+}
 
 let workforceData = null;
 let activeDept = 'labs';
@@ -234,8 +236,17 @@ function escapeHtml(str){
 
 async function loadWorkforce(){
   try{
-    const doc = await db.collection('platform').doc('main').get();
-    const data = doc.exists ? doc.data() : {};
+    const res = await fetch(GH_API + '?ref=main&t=' + Date.now(), {
+      headers: {
+        'Authorization': 'Bearer ' + GH_TOKEN,
+        'Accept': 'application/vnd.github+json',
+        'X-GitHub-Api-Version': '2022-11-28',
+      },
+      cache: 'no-store',
+    });
+    if(!res.ok) return null;
+    const json = await res.json();
+    const data = JSON.parse(b64DecodeUnicode(json.content));
     return data['workforceData_v2'] || null;
   }catch(e){ console.error(e); return null; }
 }
