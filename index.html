@@ -372,9 +372,6 @@
         <p class="muted">مشاريع ومبادرات الأقسام مع نسبة الإنجاز والحالة</p>
       </div>
       <div class="stats-row" id="projectStatsRow"></div>
-      <div class="toolbar">
-        <button class="btn btn-primary" id="addProjectBtn">+ إضافة مشروع</button>
-      </div>
       <div class="tabs" id="projectDeptTabs"></div>
       <div id="projectsGrid" class="projects-grid"></div>
     </div>
@@ -392,67 +389,6 @@
   </div>
 
   <!-- Project Modal -->
-  <div class="modal-overlay" id="projectModalOverlay">
-    <div class="modal">
-      <div class="modal-head">
-        <h3 id="projectModalTitle">إضافة مشروع</h3>
-        <button class="modal-close" id="projectModalCloseBtn">✕</button>
-      </div>
-      <div class="modal-body">
-        <div class="field">
-          <label>القسم</label>
-          <input type="text" id="p_dept" placeholder="مثال: قسم المختبرات">
-        </div>
-        <div class="field">
-          <label>اسم المشروع</label>
-          <input type="text" id="p_name" placeholder="اسم المشروع أو المبادرة">
-        </div>
-        <div class="field">
-          <label>وصف المشروع</label>
-          <textarea id="p_desc" placeholder="وصف مختصر للمشروع وأهدافه"></textarea>
-        </div>
-        <div class="field">
-          <label>المسؤول</label>
-          <input type="text" id="p_resp" placeholder="اسم المسؤول عن المشروع">
-        </div>
-        <div class="field-row">
-          <div class="field">
-            <label>تاريخ البداية</label>
-            <input type="date" id="p_start">
-          </div>
-          <div class="field">
-            <label>تاريخ النهاية</label>
-            <input type="date" id="p_end">
-          </div>
-        </div>
-        <div class="field-row">
-          <div class="field">
-            <label>نسبة الإنجاز (%)</label>
-            <input type="text" id="p_pct" placeholder="مثال: 70">
-          </div>
-          <div class="field">
-            <label>الحالة</label>
-            <select id="p_status">
-              <option>لم يبدأ</option>
-              <option>قيد التنفيذ</option>
-              <option>مكتمل</option>
-              <option>متأخر</option>
-            </select>
-          </div>
-        </div>
-        <div class="field">
-          <label>ملاحظات / تحديثات</label>
-          <textarea id="p_blocker" placeholder="آخر مستجدات أو معوقات المشروع"></textarea>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-ghost" id="projectCancelBtn">إلغاء</button>
-        <button class="btn btn-danger-ghost" id="projectDeleteBtn" style="display:none;">حذف</button>
-        <button class="btn btn-primary" id="projectSaveBtn">حفظ</button>
-      </div>
-    </div>
-  </div>
-
   <div class="toast" id="toast"></div>
 
 <script>
@@ -516,11 +452,15 @@ async function renderWorkforce(){
     r.current.forEach(v => { if(typeof v === 'number') totalCurrent += v; });
     r.needed.forEach(v => { if(typeof v === 'number') totalNeeded += v; });
   });
+  // rank specialties by how many new positions each still needs
   const bySpecialtyNeed = workforceData.rows.map(r => ({
     specialty: r.specialty,
     need: r.needed.reduce((a,v) => a + (typeof v === 'number' ? v : 0), 0),
   })).sort((a,b) => b.need - a.need);
   const topNeed = bySpecialtyNeed[0];
+  // lowest need = the most complete specialty (last in the sorted list)
+  const lowNeed = bySpecialtyNeed.length > 1 ? bySpecialtyNeed[bySpecialtyNeed.length - 1] : null;
+
   const statsEl = document.getElementById('workforceStatsRow');
   if(statsEl){
     statsEl.innerHTML = `
@@ -528,7 +468,8 @@ async function renderWorkforce(){
       <div class="stat-card waiting"><div class="num">${totalNeeded}</div><div class="lbl">إجمالي الاحتياج</div></div>
       <div class="stat-card progress"><div class="num">${workforceData.hospitals.length}</div><div class="lbl">عدد المنشآت</div></div>
       <div class="stat-card notstarted"><div class="num">${workforceData.rows.length}</div><div class="lbl">عدد التخصصات</div></div>
-      ${topNeed && topNeed.need > 0 ? `<div class="stat-card recurring"><div class="num" style="font-size:15px;">${escapeHtml(topNeed.specialty)}</div><div class="lbl">الأعلى احتياجًا (${topNeed.need})</div></div>` : ''}
+      ${topNeed && topNeed.need > 0 ? `<div class="stat-card late"><div class="num" style="font-size:15px;">${escapeHtml(topNeed.specialty)}</div><div class="lbl">🔺 الأعلى احتياجًا (${topNeed.need} وظيفة)</div></div>` : ''}
+      ${lowNeed ? `<div class="stat-card done"><div class="num" style="font-size:15px;">${escapeHtml(lowNeed.specialty)}</div><div class="lbl">${lowNeed.need === 0 ? '✅ الأقل احتياجًا (مكتمل)' : '✅ الأقل احتياجًا (' + lowNeed.need + ' وظيفة)'}</div></div>` : ''}
     `;
   }
 
@@ -589,7 +530,6 @@ async function renderWorkforce(){
 /* ---------- Projects (editable) ---------- */
 let projectsData = null;
 let projectDeptFilter = '';
-let editingProjectId = null;
 
 async function loadProjectsData(){
   let data = await storageGet('projectsData');
@@ -599,10 +539,6 @@ async function loadProjectsData(){
   }
   return data;
 }
-async function saveProjectsData(){
-  await storageSet('projectsData', projectsData);
-}
-
 async function renderProjects(){
   if(!projectsData){
     projectsData = await loadProjectsData();
@@ -633,7 +569,7 @@ async function renderProjects(){
     const st = STATUS_STYLE[p.status] || STATUS_STYLE['لم يبدأ'];
     const pct = (typeof p.pct === 'number') ? p.pct : null;
     return `
-      <div class="project-card" data-pid="${p.id}" style="cursor:pointer;">
+      <div class="project-card">
         <div class="pdept">${escapeHtml(p.dept)}</div>
         <div class="pname">${escapeHtml(p.name) || '<span class="muted">بدون اسم</span>'}</div>
         ${p.desc ? `<div class="pdesc">${escapeHtml(p.desc)}</div>` : ''}
@@ -650,81 +586,8 @@ async function renderProjects(){
       </div>
     `;
   }).join('') || '<div class="empty-state">لا توجد مشاريع</div>';
-
-  grid.querySelectorAll('[data-pid]').forEach(card => {
-    card.addEventListener('click', () => openProjectModal(card.dataset.pid));
-  });
 }
 
-function openProjectModal(projectId){
-  editingProjectId = projectId || null;
-  document.getElementById('projectModalTitle').textContent = projectId ? 'تعديل المشروع' : 'إضافة مشروع';
-  document.getElementById('projectDeleteBtn').style.display = projectId ? 'inline-flex' : 'none';
-  let p = {dept:'',name:'',desc:'',resp:'',start:'',end:'',pct:null,status:'لم يبدأ',blocker:''};
-  if(projectId){
-    const found = projectsData.find(x => x.id === projectId);
-    if(found) p = found;
-  }
-  document.getElementById('p_dept').value = p.dept || '';
-  document.getElementById('p_name').value = p.name || '';
-  document.getElementById('p_desc').value = p.desc || '';
-  document.getElementById('p_resp').value = p.resp || '';
-  document.getElementById('p_start').value = guessISODate(p.start);
-  document.getElementById('p_end').value = guessISODate(p.end);
-  document.getElementById('p_pct').value = (typeof p.pct === 'number') ? p.pct : '';
-  document.getElementById('p_status').value = p.status || 'لم يبدأ';
-  document.getElementById('p_blocker').value = p.blocker || '';
-  document.getElementById('projectModalOverlay').classList.add('open');
-}
-function closeProjectModal(){
-  document.getElementById('projectModalOverlay').classList.remove('open');
-  editingProjectId = null;
-}
-async function saveProject(){
-  const name = document.getElementById('p_name').value.trim();
-  if(!name){ showToast('الرجاء إدخال اسم المشروع'); return; }
-  await ensureIdentity();
-  const pctVal = document.getElementById('p_pct').value.trim();
-  const payload = {
-    dept: document.getElementById('p_dept').value.trim(),
-    name,
-    desc: document.getElementById('p_desc').value.trim(),
-    resp: document.getElementById('p_resp').value.trim(),
-    start: document.getElementById('p_start').value.trim(),
-    end: document.getElementById('p_end').value.trim(),
-    pct: pctVal === '' ? null : Number(pctVal),
-    status: document.getElementById('p_status').value,
-    blocker: document.getElementById('p_blocker').value.trim(),
-  };
-  if(editingProjectId){
-    const idx = projectsData.findIndex(x => x.id === editingProjectId);
-    if(idx > -1) projectsData[idx] = {...projectsData[idx], ...payload};
-  } else {
-    projectsData.unshift({id: uid('proj'), ...payload});
-  }
-  await saveProjectsData();
-  closeProjectModal();
-  renderProjects();
-  showToast('تم الحفظ بنجاح');
-}
-async function deleteProject(){
-  if(!editingProjectId) return;
-  if(!confirm('هل تريد حذف هذا المشروع؟')) return;
-  projectsData = projectsData.filter(x => x.id !== editingProjectId);
-  await saveProjectsData();
-  closeProjectModal();
-  renderProjects();
-  showToast('تم الحذف');
-}
-
-document.getElementById('addProjectBtn').addEventListener('click', () => openProjectModal(null));
-document.getElementById('projectModalCloseBtn').addEventListener('click', closeProjectModal);
-document.getElementById('projectCancelBtn').addEventListener('click', closeProjectModal);
-document.getElementById('projectSaveBtn').addEventListener('click', saveProject);
-document.getElementById('projectDeleteBtn').addEventListener('click', deleteProject);
-document.getElementById('projectModalOverlay').addEventListener('click', (e) => {
-  if(e.target.id === 'projectModalOverlay') closeProjectModal();
-});
 
 /* ---------- Staff ---------- */
 function renderStaff(){
