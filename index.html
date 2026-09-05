@@ -946,6 +946,47 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
+/* ---------- Connection health banner ----------
+   If the browser cannot reach Firestore (blocked by an extension, firewall, or
+   offline), the SDK silently falls back to a local cache and every edit is lost
+   on refresh. Make that state loud instead of silent. */
+let connectionOk = null;
+function showConnectionBanner(ok, detail){
+  let el = document.getElementById('connBanner');
+  if(!el){
+    el = document.createElement('div');
+    el.id = 'connBanner';
+    el.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:200;padding:12px 18px;font-size:13.5px;font-weight:700;text-align:center;font-family:inherit;';
+    document.body.appendChild(el);
+  }
+  if(ok){
+    el.style.display = 'none';
+    document.body.style.paddingTop = '';
+  } else {
+    el.style.background = '#c23b2e';
+    el.style.color = '#fff';
+    el.innerHTML = '⚠️ لا يوجد اتصال بقاعدة البيانات — أي تعديل تسويه الآن <u>لن يُحفظ</u> وسيضيع عند تحديث الصفحة.'
+      + (detail ? ' <span style="font-weight:400;opacity:.85;">(' + escapeHtml(detail) + ')</span>' : '');
+    el.style.display = 'block';
+    document.body.style.paddingTop = el.offsetHeight + 'px';
+  }
+}
+
+async function checkConnection(){
+  try{
+    // force a real server round-trip (bypasses the local cache)
+    await db.collection('platform').doc('main').get({ source: 'server' });
+    if(connectionOk !== true){ connectionOk = true; showConnectionBanner(true); }
+    return true;
+  }catch(e){
+    if(connectionOk !== false){
+      connectionOk = false;
+      showConnectionBanner(false, e && e.code ? e.code : 'offline');
+    }
+    return false;
+  }
+}
+
 /* In-memory cache for the single shared 'main' document, so loading 6
    departments + workforce doesn't trigger 7 separate network round-trips.
    invalidateMainDoc() forces a fresh fetch (called before each load/poll cycle). */
@@ -1519,6 +1560,7 @@ async function init(){
   await loadIdentity();
   renderIdentityBar();
   renderSectionNav();
+  await checkConnection();
   state.departments = await loadAllDepartments();
   state.activeDept = state.departments[0]?.id || null;
   renderStats();
@@ -1536,6 +1578,7 @@ init();
 setInterval(async () => {
   const modalOpen = document.getElementById('modalOverlay').classList.contains('open');
   if(modalOpen) return;
+  await checkConnection();
   try{
     if(activeSection === 'tasks'){
       state.departments = await loadAllDepartments();
