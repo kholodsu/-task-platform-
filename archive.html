@@ -556,7 +556,32 @@ function renderEquipmentPlaceholder(deptName){
   `;
 }
 
+/* Departments that group several distinct professions are shown one chart per
+   profession, since a combined total hides how each specialty is distributed. */
+const SPLIT_BY_SPECIALTY = {
+  rehab:  ['العلاج الطبيعي', 'العلاج الوظيفي', 'الأطراف الصناعية', 'النطق والتخاطب'],
+  mental: ['الأخصائي النفسي', 'الأخصائي الاجتماعي'],
+};
+
+function specialtyChart(specialtyName){
+  const row = WORKFORCE_ARCHIVE.rows.find(r => r.specialty === specialtyName);
+  if(!row) return '';
+  const items = WORKFORCE_ARCHIVE.hospitals.map((h, i) => ({
+    label: h,
+    value: typeof row.current[i] === 'number' ? row.current[i] : 0,
+  })).filter(x => x.value > 0);
+  if(items.length === 0){
+    return `<div class="card"><h3>${iconBadge("👥","badge-blue")} ${escapeHtml(specialtyName)}</h3>
+      <div class="empty-note">لا يوجد كادر مسجّل لهذا التخصص حاليًا</div></div>`;
+  }
+  return renderBarChart(specialtyName, items);
+}
+
 function workforceCardForDept(dept){
+  const split = SPLIT_BY_SPECIALTY[dept.id];
+  if(split){
+    return split.map(specialtyChart).join('');
+  }
   const items = WORKFORCE_FINAL[dept.id];
   if(!items) return '';
   const mapped = items.map(it => ({label: it.facility, value: it.value}));
