@@ -235,6 +235,10 @@
   .wf-needed-col{background:rgba(253,241,222,0.55);}
   .wf-needed-col .wf-input{color:var(--orange);}
   th.wf-needed-col{color:var(--orange); background:rgba(253,241,222,0.75);}
+  .wf-heat-short{background:rgba(194,59,46,0.10);}
+  .wf-heat-short .wf-input{color:var(--red); font-weight:800;}
+  .wf-heat-ok{background:rgba(26,156,111,0.08);}
+  .wf-heat-ok .wf-input{color:var(--green); font-weight:700;}
 
   /* projects grid */
   .projects-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(300px,1fr)); gap:14px;}
@@ -334,10 +338,15 @@
         <h2>القوى العاملة — العدد الحالي مقابل الاحتياج لكل تخصص ومنشأة</h2>
         <div class="edit-meta" id="workforceEditMeta"></div>
       </div>
+      <div class="stats-row" id="workforceStatsRow"></div>
       <div class="toolbar">
         <button class="btn btn-primary" id="addSpecialtyBtn">+ إضافة تخصص</button>
         <button class="btn btn-primary" id="addHospitalBtn">+ إضافة منشأة</button>
         <button class="btn btn-ghost" id="importLatestWorkforceBtn">🔄 استيراد أحدث بيانات القوى العاملة</button>
+      </div>
+      <div style="display:flex; gap:16px; margin-bottom:12px; flex-wrap:wrap;">
+        <span style="display:flex; align-items:center; gap:6px; font-size:12px; color:var(--gray-700);"><span style="width:12px;height:12px;border-radius:3px;background:rgba(194,59,46,0.25); display:inline-block;"></span> يحتاج توظيف إضافي</span>
+        <span style="display:flex; align-items:center; gap:6px; font-size:12px; color:var(--gray-700);"><span style="width:12px;height:12px;border-radius:3px;background:rgba(26,156,111,0.20); display:inline-block;"></span> مكتمل الكادر</span>
       </div>
       <div class="table-wrap" style="overflow-x:auto;">
         <table id="workforceTable"></table>
@@ -601,6 +610,30 @@ async function renderWorkforce(){
       ? '✏️ آخر تحديث: ' + workforceData.lastEditedBy + ' — ' + (workforceData.lastEditedAt||'')
       : '';
   }
+
+  // KPI summary strip
+  const statsEl = document.getElementById('workforceStatsRow');
+  if(statsEl){
+    let totalCurrent = 0, totalNeeded = 0;
+    workforceData.rows.forEach(r => {
+      r.current.forEach(v => { if(typeof v === 'number') totalCurrent += v; });
+      r.needed.forEach(v => { if(typeof v === 'number') totalNeeded += v; });
+    });
+    // top specialty by needed count
+    const bySpecialtyNeed = workforceData.rows.map(r => ({
+      specialty: r.specialty,
+      need: r.needed.reduce((a,v) => a + (typeof v === 'number' ? v : 0), 0),
+    })).sort((a,b) => b.need - a.need);
+    const topNeed = bySpecialtyNeed[0];
+    statsEl.innerHTML = `
+      <div class="stat-card total"><div class="num">${totalCurrent}</div><div class="lbl">إجمالي الكادر الحالي</div></div>
+      <div class="stat-card waiting"><div class="num">${totalNeeded}</div><div class="lbl">إجمالي الاحتياج (وظائف جديدة)</div></div>
+      <div class="stat-card progress"><div class="num">${workforceData.hospitals.length}</div><div class="lbl">عدد المنشآت</div></div>
+      <div class="stat-card notstarted"><div class="num">${workforceData.rows.length}</div><div class="lbl">عدد التخصصات</div></div>
+      ${topNeed && topNeed.need > 0 ? `<div class="stat-card recurring"><div class="num" style="font-size:15px;">${escapeHtml(topNeed.specialty)}</div><div class="lbl">الأعلى احتياجًا (${topNeed.need})</div></div>` : ''}
+    `;
+  }
+
   const el = document.getElementById('workforceTable');
 
   // header row 1: hospital names spanning 2 sub-columns each (editable)
@@ -624,7 +657,8 @@ async function renderWorkforce(){
     workforceData.hospitals.forEach((h, cIdx) => {
       const cur = r.current[cIdx];
       const need = r.needed[cIdx];
-      html += `<td><input type="number" class="wf-input wf-cell" data-row="${rIdx}" data-col="${cIdx}" data-field="current" value="${cur === null || cur === undefined ? '' : cur}" placeholder="—"></td>`;
+      const heatClass = (typeof need === 'number' && need > 0) ? 'wf-heat-short' : ((typeof cur === 'number' && cur > 0) ? 'wf-heat-ok' : '');
+      html += `<td class="${heatClass}"><input type="number" class="wf-input wf-cell" data-row="${rIdx}" data-col="${cIdx}" data-field="current" value="${cur === null || cur === undefined ? '' : cur}" placeholder="—"></td>`;
       html += `<td class="wf-needed-col"><input type="number" class="wf-input wf-cell" data-row="${rIdx}" data-col="${cIdx}" data-field="needed" value="${need === null || need === undefined ? '' : need}" placeholder="—"></td>`;
     });
     html += `<td><button class="btn btn-danger-ghost btn-sm" data-delrow="${rIdx}">حذف</button></td>`;
