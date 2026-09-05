@@ -73,6 +73,11 @@
   @media (max-width: 900px){ .stats-row{grid-template-columns:repeat(3,1fr);} }
   @media (max-width: 560px){ .stats-row{grid-template-columns:repeat(2,1fr);} }
   .stat-card{background:var(--glass-bg); backdrop-filter:var(--glass-blur); -webkit-backdrop-filter:var(--glass-blur); border-radius:var(--radius); padding:14px 16px; box-shadow:var(--shadow); border:1px solid var(--glass-border);}
+  .stat-card.clickable{cursor:pointer; transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;}
+  .stat-card.clickable:hover{transform:translateY(-2px); box-shadow:0 10px 24px rgba(20,80,130,0.14);}
+  .stat-card.stat-active{border-color:var(--blue-500); box-shadow:0 0 0 2px rgba(27,148,208,0.25), var(--shadow);}
+  .dept-tag{display:inline-block; margin-top:4px; font-size:10.5px; font-weight:700; color:var(--blue-700); background:var(--blue-50); padding:2px 9px; border-radius:999px;}
+  .filter-note{display:inline-flex; align-items:center; font-size:12px; font-weight:700; color:var(--blue-600); margin-inline-start:6px;}
   .stat-card .num{font-size:22px; font-weight:800; color:var(--blue-700);}
   .stat-card .lbl{font-size:12px; color:var(--gray-500); margin-top:2px;}
   .stat-card.total .num{color:var(--blue-500);}
@@ -530,6 +535,7 @@ async function renderWorkforce(){
 /* ---------- Projects (editable) ---------- */
 let projectsData = null;
 let projectDeptFilter = '';
+let projectStatusFilter = '';
 
 async function loadProjectsData(){
   let data = await storageGet('projectsData');
@@ -547,12 +553,22 @@ async function renderProjects(){
   const statsEl = document.getElementById('projectStatsRow');
   const counts = {'مكتمل':0,'قيد التنفيذ':0,'لم يبدأ':0,'متأخر':0};
   projectsData.forEach(p => { if(counts[p.status] !== undefined) counts[p.status]++; });
+  const psel = st => projectStatusFilter === st ? ' stat-active' : '';
+  // only offer a status card when that status actually occurs in the data,
+  // so a filter can never lead to an empty screen
   statsEl.innerHTML = `
-    <div class="stat-card total"><div class="num">${projectsData.length}</div><div class="lbl">إجمالي المشاريع</div></div>
-    <div class="stat-card done"><div class="num">${counts['مكتمل']}</div><div class="lbl">مكتمل</div></div>
-    <div class="stat-card progress"><div class="num">${counts['قيد التنفيذ']}</div><div class="lbl">قيد التنفيذ</div></div>
-    <div class="stat-card notstarted"><div class="num">${counts['لم يبدأ']}</div><div class="lbl">لم يبدأ</div></div>
+    <div class="stat-card total clickable${projectStatusFilter===''?' stat-active':''}" data-pstatus=""><div class="num">${projectsData.length}</div><div class="lbl">إجمالي المشاريع</div></div>
+    ${counts['مكتمل'] ? `<div class="stat-card done clickable${psel('مكتمل')}" data-pstatus="مكتمل"><div class="num">${counts['مكتمل']}</div><div class="lbl">مكتمل</div></div>` : ''}
+    ${counts['قيد التنفيذ'] ? `<div class="stat-card progress clickable${psel('قيد التنفيذ')}" data-pstatus="قيد التنفيذ"><div class="num">${counts['قيد التنفيذ']}</div><div class="lbl">قيد التنفيذ</div></div>` : ''}
+    ${counts['لم يبدأ'] ? `<div class="stat-card notstarted clickable${psel('لم يبدأ')}" data-pstatus="لم يبدأ"><div class="num">${counts['لم يبدأ']}</div><div class="lbl">لم يبدأ</div></div>` : ''}
+    ${counts['متأخر'] ? `<div class="stat-card late clickable${psel('متأخر')}" data-pstatus="متأخر"><div class="num">${counts['متأخر']}</div><div class="lbl">متأخر</div></div>` : ''}
   `;
+  statsEl.querySelectorAll('.stat-card.clickable').forEach(card => {
+    card.addEventListener('click', () => {
+      projectStatusFilter = card.dataset.pstatus;
+      renderProjects();
+    });
+  });
 
   const tabsEl = document.getElementById('projectDeptTabs');
   const allTabs = [{id:'', name:'الكل'}, ...depts.map(d => ({id:d, name:d}))];
@@ -564,7 +580,10 @@ async function renderProjects(){
   });
 
   const grid = document.getElementById('projectsGrid');
-  const list = projectsData.filter(p => !projectDeptFilter || p.dept === projectDeptFilter);
+  const list = projectsData.filter(p =>
+    (!projectDeptFilter || p.dept === projectDeptFilter) &&
+    (!projectStatusFilter || p.status === projectStatusFilter)
+  );
   grid.innerHTML = list.map(p => {
     const st = STATUS_STYLE[p.status] || STATUS_STYLE['لم يبدأ'];
     const pct = (typeof p.pct === 'number') ? p.pct : null;
@@ -807,26 +826,40 @@ function computeOverallStats(depts){
 function renderStats(){
   const s = computeOverallStats(state.departments);
   const el = document.getElementById('statsRow');
+  const sel = st => state.statusFilter === st ? ' stat-active' : '';
   el.innerHTML = `
-    <div class="stat-card total"><div class="num">${s.total}</div><div class="lbl">إجمالي المهام</div></div>
-    <div class="stat-card done"><div class="num">${s.done}</div><div class="lbl">مكتمل</div></div>
-    <div class="stat-card progress"><div class="num">${s.progress}</div><div class="lbl">تحت الإجراء</div></div>
-    <div class="stat-card notstarted"><div class="num">${s.notstarted}</div><div class="lbl">لم يبدأ</div></div>
-    <div class="stat-card waiting"><div class="num">${s.waiting}</div><div class="lbl">بانتظار رد</div></div>
-    <div class="stat-card recurring"><div class="num">${s.recurring}</div><div class="lbl">دوري / متأخر</div></div>
+    <div class="stat-card total clickable${state.statusFilter===''?' stat-active':''}" data-status=""><div class="num">${s.total}</div><div class="lbl">إجمالي المهام</div></div>
+    <div class="stat-card done clickable${sel('مكتمل')}" data-status="مكتمل"><div class="num">${s.done}</div><div class="lbl">مكتمل</div></div>
+    <div class="stat-card progress clickable${sel('تحت الإجراء')}" data-status="تحت الإجراء"><div class="num">${s.progress}</div><div class="lbl">تحت الإجراء</div></div>
+    <div class="stat-card notstarted clickable${sel('لم يبدأ')}" data-status="لم يبدأ"><div class="num">${s.notstarted}</div><div class="lbl">لم يبدأ</div></div>
+    <div class="stat-card waiting clickable${sel('بانتظار رد')}" data-status="بانتظار رد"><div class="num">${s.waiting}</div><div class="lbl">بانتظار رد</div></div>
+    <div class="stat-card late clickable${sel('متأخر')}" data-status="متأخر"><div class="num">${s.late}</div><div class="lbl">متأخر</div></div>
+    <div class="stat-card recurring clickable${sel('يتابع بشكل دوري')}" data-status="يتابع بشكل دوري"><div class="num">${s.recurring}</div><div class="lbl">يتابع بشكل دوري</div></div>
   `;
+  el.querySelectorAll('.stat-card.clickable').forEach(card => {
+    card.addEventListener('click', () => {
+      state.statusFilter = card.dataset.status;
+      const sf = document.getElementById('statusFilter'); if(sf) sf.value = state.statusFilter;
+      renderStats(); renderTabs(); renderTable();
+    });
+  });
 }
 
 function renderTabs(){
   const el = document.getElementById('tabsRow');
+  const filtering = !!(state.statusFilter || state.search.trim());
   el.innerHTML = state.departments.map(d => `
-    <div class="tab ${d.id===state.activeDept? 'active':''}" data-dept="${d.id}">
+    <div class="tab ${(!filtering && d.id===state.activeDept) ? 'active':''}" data-dept="${d.id}">
       ${d.name} <span class="count">${d.tasks.length}</span>
     </div>
-  `).join('');
+  `).join('') + (filtering ? '<span class="filter-note">🔎 عرض النتائج من جميع الأقسام</span>' : '');
   el.querySelectorAll('.tab').forEach(tab => {
     tab.addEventListener('click', () => {
       state.activeDept = tab.dataset.dept;
+      state.statusFilter = '';
+      state.search = '';
+      const sf = document.getElementById('statusFilter'); if(sf) sf.value = '';
+      const si = document.getElementById('searchInput');  if(si) si.value = '';
       renderTabs();
       renderTable();
     });
@@ -854,13 +887,19 @@ function escapeHtml(str){
 }
 
 function renderTable(){
-  const dept = state.departments.find(d => d.id === state.activeDept);
   const tbody = document.getElementById('taskTableBody');
   const emptyState = document.getElementById('emptyState');
-  if(!dept){ tbody.innerHTML=''; return; }
-
   const q = state.search.trim().toLowerCase();
-  let tasks = dept.tasks.filter(t => {
+
+  // A status filter (or a search) is a cluster-wide question — e.g. "متأخر" only
+  // exists in 2 departments, so scoping it to the open tab would show nothing.
+  // Only fall back to the active department when no filter is applied.
+  const crossDept = !!(state.statusFilter || q);
+  const source = crossDept
+    ? state.departments.flatMap(d => d.tasks.map(t => ({...t, __dept: d.name})))
+    : (state.departments.find(d => d.id === state.activeDept)?.tasks || []);
+
+  let tasks = source.filter(t => {
     const matchesSearch = !q || (t.task||'').toLowerCase().includes(q) || (t.responsible||'').toLowerCase().includes(q);
     const matchesStatus = !state.statusFilter || t.status === state.statusFilter;
     return matchesSearch && matchesStatus;
@@ -882,6 +921,7 @@ function renderTable(){
     return `
       <tr data-id="${t.id}">
         <td class="task-title" data-label="المهمة">${escapeHtml(t.task)}
+          ${t.__dept ? `<div class="dept-tag">${escapeHtml(t.__dept)}</div>` : ''}
           ${t.lastEditedBy ? `<div class="edit-meta">✏️ آخر تعديل: ${escapeHtml(t.lastEditedBy)} — ${escapeHtml(t.lastEditedAt||'')}</div>` : ''}
         </td>
         <td data-label="تاريخ التكليف">${escapeHtml(t.assignDate) || '<span class="muted">—</span>'}</td>
@@ -911,11 +951,11 @@ function showToast(msg){
 function setupEvents(){
   document.getElementById('searchInput').addEventListener('input', (e) => {
     state.search = e.target.value;
-    renderTable();
+    renderTabs(); renderTable();
   });
   document.getElementById('statusFilter').addEventListener('change', (e) => {
     state.statusFilter = e.target.value;
-    renderTable();
+    renderStats(); renderTabs(); renderTable();
   });
 }
 
