@@ -377,19 +377,6 @@
       <div id="staffGrid" class="staff-grid"></div>
     </div>
 
-    <div id="section-archive" class="section-panel" style="display:none;">
-      <div class="panel-head">
-        <h2>أرشيف الإدارة</h2>
-        <p class="muted">ملفات ومستندات كل قسم — أجهزة، قوى عاملة، تقارير، وأي مستند آخر</p>
-      </div>
-      <div class="tabs" id="archiveDeptTabs"></div>
-      <div class="toolbar">
-        <input type="file" id="archiveFileInput">
-        <span class="hint" style="margin-right:auto;">الحد الأقصى لحجم الملف الواحد 650 كيلوبايت</span>
-      </div>
-      <div id="archiveFileList" class="archive-list"></div>
-    </div>
-
   </div>
 
   <!-- Modal -->
@@ -545,7 +532,6 @@ const SECTIONS = [
   {id:'workforce', label:'القوى العاملة', icon:'👥'},
   {id:'projects', label:'لوحة المشاريع', icon:'📊'},
   {id:'staff', label:'بيانات الموظفين', icon:'🪪'},
-  {id:'archive', label:'أرشيف الإدارة', icon:'🗄️'},
 ];
 let activeSection = 'tasks';
 
@@ -568,7 +554,6 @@ function switchSection(id){
   if(id === 'workforce') renderWorkforce();
   if(id === 'projects') renderProjects();
   if(id === 'staff') renderStaff();
-  if(id === 'archive') renderArchiveTabs();
 }
 
 /* ---------- Workforce (editable, current vs needed) ---------- */
@@ -923,90 +908,8 @@ function renderStaff(){
   `).join('') || '<div class="empty-state">لا توجد نتائج</div>';
 }
 
-/* ---------- Archive (per-department file library) ---------- */
-let archiveDeptId = null;
 
-function renderArchiveTabs(){
-  if(!archiveDeptId) archiveDeptId = SEED_DATA[0]?.id || null;
-  const el = document.getElementById('archiveDeptTabs');
-  el.innerHTML = SEED_DATA.map(d => `
-    <div class="tab ${d.id===archiveDeptId?'active':''}" data-adept="${d.id}">${escapeHtml(d.name)}</div>
-  `).join('');
-  el.querySelectorAll('.tab').forEach(tab => {
-    tab.addEventListener('click', () => {
-      archiveDeptId = tab.dataset.adept;
-      renderArchiveTabs();
-      renderArchiveList();
-    });
-  });
-  renderArchiveList();
-}
 
-async function renderArchiveList(){
-  const listEl = document.getElementById('archiveFileList');
-  listEl.innerHTML = '<div class="empty-state">جارٍ التحميل...</div>';
-  const files = (await storageGet('archive:' + archiveDeptId)) || [];
-  if(files.length === 0){
-    listEl.innerHTML = '<div class="empty-state">📁 لا توجد ملفات بعد لهذا القسم</div>';
-    return;
-  }
-  listEl.innerHTML = files.map(f => `
-    <div class="archive-item">
-      <div>
-        <div class="archive-item-name">📄 ${escapeHtml(f.name)}</div>
-        <div class="muted">${formatBytes(f.size)} · رفعه ${escapeHtml(f.uploadedBy||'غير معروف')} · ${escapeHtml(f.uploadedAt||'')}</div>
-      </div>
-      <div class="row-actions">
-        <button class="btn btn-ghost btn-sm" data-openarchive="${f.id}" data-fname="${escapeHtml(f.name)}" data-ftype="${escapeHtml(f.type||'')}">فتح</button>
-        <button class="btn btn-danger-ghost btn-sm" data-delarchive="${f.id}">حذف</button>
-      </div>
-    </div>
-  `).join('');
-  listEl.querySelectorAll('[data-openarchive]').forEach(btn => {
-    btn.addEventListener('click', () => openAttachment('archive-' + btn.dataset.openarchive, btn.dataset.fname, btn.dataset.ftype));
-  });
-  listEl.querySelectorAll('[data-delarchive]').forEach(btn => {
-    btn.addEventListener('click', async () => {
-      if(!confirm('هل تريد حذف هذا الملف؟')) return;
-      const fileId = btn.dataset.delarchive;
-      await storageDelete('attach:archive-' + fileId);
-      const current = (await storageGet('archive:' + archiveDeptId)) || [];
-      await storageSet('archive:' + archiveDeptId, current.filter(x => x.id !== fileId));
-      renderArchiveList();
-      showToast('تم حذف الملف');
-    });
-  });
-}
-
-document.getElementById('archiveFileInput').addEventListener('change', async (e) => {
-  const file = e.target.files[0];
-  if(!file) return;
-  if(file.size > MAX_ATTACH_BYTES){
-    showToast('الملف كبير جدًا (' + formatBytes(file.size) + '). الحد الأقصى ' + formatBytes(MAX_ATTACH_BYTES));
-    e.target.value = '';
-    return;
-  }
-  await ensureIdentity();
-  showToast('جارٍ رفع الملف...');
-  try{
-    const dataBase64 = await readFileAsBase64(file);
-    const fileId = uid('arc');
-    await storageSet('attach:archive-' + fileId, { name: file.name, type: file.type, dataBase64 });
-    const current = (await storageGet('archive:' + archiveDeptId)) || [];
-    current.unshift({
-      id: fileId, name: file.name, type: file.type, size: file.size,
-      uploadedBy: currentUserName || 'غير معروف',
-      uploadedAt: new Date().toLocaleString('ar-SA', {dateStyle:'medium', timeStyle:'short'}),
-    });
-    await storageSet('archive:' + archiveDeptId, current);
-    e.target.value = '';
-    renderArchiveList();
-    showToast('تم رفع الملف بنجاح');
-  }catch(err){
-    console.error(err);
-    showToast('تعذر رفع الملف');
-  }
-});
 
 
 const STATUS_STYLE = {
