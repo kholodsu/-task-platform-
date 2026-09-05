@@ -974,7 +974,19 @@ async function storageSet(key, value){
       const taskId = key.slice(7);
       await db.collection('attachments').doc(taskId).set(value);
     } else {
-      await db.collection('platform').doc('main').set({ [key]: value }, { merge: true });
+      // Field names containing "." or ":" are interpreted as nested field paths by
+      // Firestore's set()/update() shorthand, which silently breaks keys like
+      // "deptTasks:labs". Wrapping the key in a FieldPath forces it to be treated
+      // as a single literal field name.
+      const ref = db.collection('platform').doc('main');
+      const path = new firebase.firestore.FieldPath(key);
+      try{
+        await ref.update(path, value);
+      }catch(err){
+        // document may not exist yet -> create it, then retry
+        await ref.set({}, { merge: true });
+        await ref.update(path, value);
+      }
       if(mainDocCache === null) mainDocCache = {};
       mainDocCache[key] = value;
     }
@@ -986,7 +998,8 @@ async function storageDelete(key){
       const taskId = key.slice(7);
       await db.collection('attachments').doc(taskId).delete();
     } else {
-      await db.collection('platform').doc('main').update({ [key]: firebase.firestore.FieldValue.delete() });
+      const path = new firebase.firestore.FieldPath(key);
+      await db.collection('platform').doc('main').update(path, firebase.firestore.FieldValue.delete());
       if(mainDocCache) delete mainDocCache[key];
     }
   }catch(e){ console.error('storageDelete failed', e); }
