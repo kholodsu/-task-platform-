@@ -218,29 +218,32 @@
   .manager-field-box label{display:flex; align-items:center; gap:6px; flex-wrap:wrap;}
   .lock-tag{font-size:11px; font-weight:600; color:var(--orange); background:rgba(255,255,255,0.6); padding:2px 8px; border-radius:999px;}
 
-  /* workforce table */
-  #workforceTable{width:100%; border-collapse:collapse; font-size:12.5px; min-width:1000px;}
-  #workforceTable th, #workforceTable td{padding:6px 8px; border-bottom:1px solid rgba(214,221,227,0.4); text-align:center; white-space:nowrap;}
-  #workforceTable thead th{background:rgba(238,246,251,0.7); color:var(--blue-700); font-weight:800; position:sticky; top:0; padding:10px 12px;}
-  #workforceTable td:first-child, #workforceTable th:first-child{text-align:right; position:sticky; right:0; background:rgba(255,255,255,0.75); font-weight:700; color:var(--gray-900); min-width:150px;}
-  #workforceTable thead th:first-child{background:rgba(238,246,251,0.85);}
-  #workforceTable tbody tr.wf-totals-row{background:rgba(238,246,251,0.6); font-weight:800;}
-  #workforceTable tbody tr.wf-totals-row td:first-child{background:rgba(238,246,251,0.75);}
-  .wf-input{width:100%; min-width:56px; border:1px solid transparent; border-radius:8px; padding:7px 6px; text-align:center; font-size:12.5px; font-family:inherit; background:transparent; color:var(--gray-900);}
-  .wf-input:hover{border-color:var(--gray-300);}
-  .wf-input:focus{border-color:var(--blue-500); background:#fff; outline:none;}
-  .wf-specialty{text-align:right; font-weight:700; min-width:150px;}
-  .wf-rowtotal{font-weight:800; color:var(--blue-600);}
-  .wf-hospital-head{background:rgba(238,246,251,0.7);}
-  .wf-hospital-name{font-weight:800; color:var(--blue-700); min-width:140px; text-align:center;}
-  .wf-sublabel{font-size:10.5px; font-weight:700; color:var(--gray-500); background:rgba(250,252,254,0.6);}
-  .wf-needed-col{background:rgba(253,241,222,0.55);}
-  .wf-needed-col .wf-input{color:var(--orange);}
-  th.wf-needed-col{color:var(--orange); background:rgba(253,241,222,0.75);}
-  .wf-heat-short{background:rgba(194,59,46,0.10);}
-  .wf-heat-short .wf-input{color:var(--red); font-weight:800;}
-  .wf-heat-ok{background:rgba(26,156,111,0.08);}
-  .wf-heat-ok .wf-input{color:var(--green); font-weight:700;}
+  /* workforce cards (read-only) */
+  .wf-cards{display:grid; grid-template-columns:repeat(auto-fill, minmax(420px,1fr)); gap:16px;}
+  .wf-card{
+    background:var(--glass-bg); backdrop-filter:var(--glass-blur); -webkit-backdrop-filter:var(--glass-blur);
+    border:1px solid var(--glass-border); border-radius:var(--radius); box-shadow:var(--shadow);
+    padding:18px 20px;
+  }
+  .wf-card-head{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:14px; padding-bottom:10px; border-bottom:1px solid rgba(214,221,227,0.5);}
+  .wf-card-head h3{margin:0; font-size:15px; font-weight:800; color:var(--blue-700);}
+  .wf-chips{display:flex; gap:6px; flex-wrap:wrap;}
+  .wf-chip{font-size:11.5px; font-weight:800; padding:4px 11px; border-radius:999px;}
+  .wf-chip-cur{background:var(--blue-50); color:var(--blue-700);}
+  .wf-chip-need{background:var(--red-bg); color:var(--red);}
+  .wf-chip-ok{background:var(--green-bg); color:var(--green);}
+
+  .wf-row{display:flex; align-items:center; gap:10px; margin-bottom:8px;}
+  .wf-name{width:150px; flex:0 0 auto; font-size:12px; font-weight:700; color:var(--gray-700); text-align:right;}
+  .wf-bar{flex:1; display:flex; height:22px; border-radius:6px; overflow:hidden; background:rgba(238,241,244,0.7);}
+  .wf-seg{display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800; color:#fff; min-width:0;}
+  .wf-seg-cur{background:var(--blue-500);}
+  .wf-seg-need{background:var(--red); opacity:.85;}
+
+  @media (max-width:760px){
+    .wf-cards{grid-template-columns:1fr;}
+    .wf-name{width:110px; font-size:11.5px;}
+  }
 
   /* projects grid */
   .projects-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(300px,1fr)); gap:14px;}
@@ -336,22 +339,15 @@
 
     <div id="section-workforce" class="section-panel" style="display:none;">
       <div class="panel-head">
-        <h2>القوى العاملة — العدد الحالي مقابل الاحتياج لكل تخصص ومنشأة</h2>
-        <div class="edit-meta" id="workforceEditMeta"></div>
+        <h2>القوى العاملة</h2>
+        <p class="muted">العدد الحالي مقابل الاحتياج لكل تخصص ومنشأة</p>
       </div>
       <div class="stats-row" id="workforceStatsRow"></div>
       <div class="toolbar">
-        <button class="btn btn-primary" id="addSpecialtyBtn">+ إضافة تخصص</button>
-        <button class="btn btn-primary" id="addHospitalBtn">+ إضافة منشأة</button>
-        <button class="btn btn-ghost" id="importLatestWorkforceBtn">🔄 استيراد أحدث بيانات القوى العاملة</button>
+        <select id="wfSpecialtyFilter"></select>
+        <span class="hint" style="margin-right:auto;">اختر تخصصًا لعرض توزيعه على المنشآت</span>
       </div>
-      <div style="display:flex; gap:16px; margin-bottom:12px; flex-wrap:wrap;">
-        <span style="display:flex; align-items:center; gap:6px; font-size:12px; color:var(--gray-700);"><span style="width:12px;height:12px;border-radius:3px;background:rgba(194,59,46,0.25); display:inline-block;"></span> يحتاج توظيف إضافي</span>
-        <span style="display:flex; align-items:center; gap:6px; font-size:12px; color:var(--gray-700);"><span style="width:12px;height:12px;border-radius:3px;background:rgba(26,156,111,0.20); display:inline-block;"></span> مكتمل الكادر</span>
-      </div>
-      <div class="table-wrap" style="overflow-x:auto;">
-        <table id="workforceTable"></table>
-      </div>
+      <div id="workforceCards" class="wf-cards"></div>
     </div>
 
     <div id="section-projects" class="section-panel" style="display:none;">
@@ -491,185 +487,85 @@ async function loadWorkforceData(){
   return data;
 }
 
-async function saveWorkforceData(){
-  const stamp = stampEdit();
-  workforceData.lastEditedBy = stamp.lastEditedBy;
-  workforceData.lastEditedAt = stamp.lastEditedAt;
-  await storageSet('workforceData_v2', workforceData);
-  const metaEl = document.getElementById('workforceEditMeta');
-  if(metaEl) metaEl.textContent = '✏️ آخر تحديث: ' + workforceData.lastEditedBy + ' — ' + workforceData.lastEditedAt;
-}
-
-function computeColTotals(field){
-  const n = workforceData.hospitals.length;
-  const totals = new Array(n).fill(0);
-  workforceData.rows.forEach(r => {
-    r[field].forEach((v,i) => { if(typeof v === 'number') totals[i] += v; });
-  });
-  return totals;
-}
-
 async function renderWorkforce(){
   if(!workforceData){
     workforceData = await loadWorkforceData();
   }
-  const metaEl = document.getElementById('workforceEditMeta');
-  if(metaEl){
-    metaEl.textContent = workforceData.lastEditedBy
-      ? '✏️ آخر تحديث: ' + workforceData.lastEditedBy + ' — ' + (workforceData.lastEditedAt||'')
-      : '';
-  }
 
-  // KPI summary strip
+  // ---- KPI strip ----
+  let totalCurrent = 0, totalNeeded = 0;
+  workforceData.rows.forEach(r => {
+    r.current.forEach(v => { if(typeof v === 'number') totalCurrent += v; });
+    r.needed.forEach(v => { if(typeof v === 'number') totalNeeded += v; });
+  });
+  const bySpecialtyNeed = workforceData.rows.map(r => ({
+    specialty: r.specialty,
+    need: r.needed.reduce((a,v) => a + (typeof v === 'number' ? v : 0), 0),
+  })).sort((a,b) => b.need - a.need);
+  const topNeed = bySpecialtyNeed[0];
   const statsEl = document.getElementById('workforceStatsRow');
   if(statsEl){
-    let totalCurrent = 0, totalNeeded = 0;
-    workforceData.rows.forEach(r => {
-      r.current.forEach(v => { if(typeof v === 'number') totalCurrent += v; });
-      r.needed.forEach(v => { if(typeof v === 'number') totalNeeded += v; });
-    });
-    // top specialty by needed count
-    const bySpecialtyNeed = workforceData.rows.map(r => ({
-      specialty: r.specialty,
-      need: r.needed.reduce((a,v) => a + (typeof v === 'number' ? v : 0), 0),
-    })).sort((a,b) => b.need - a.need);
-    const topNeed = bySpecialtyNeed[0];
     statsEl.innerHTML = `
       <div class="stat-card total"><div class="num">${totalCurrent}</div><div class="lbl">إجمالي الكادر الحالي</div></div>
-      <div class="stat-card waiting"><div class="num">${totalNeeded}</div><div class="lbl">إجمالي الاحتياج (وظائف جديدة)</div></div>
+      <div class="stat-card waiting"><div class="num">${totalNeeded}</div><div class="lbl">إجمالي الاحتياج</div></div>
       <div class="stat-card progress"><div class="num">${workforceData.hospitals.length}</div><div class="lbl">عدد المنشآت</div></div>
       <div class="stat-card notstarted"><div class="num">${workforceData.rows.length}</div><div class="lbl">عدد التخصصات</div></div>
       ${topNeed && topNeed.need > 0 ? `<div class="stat-card recurring"><div class="num" style="font-size:15px;">${escapeHtml(topNeed.specialty)}</div><div class="lbl">الأعلى احتياجًا (${topNeed.need})</div></div>` : ''}
     `;
   }
 
-  const el = document.getElementById('workforceTable');
+  // ---- specialty filter (built once) ----
+  const sel = document.getElementById('wfSpecialtyFilter');
+  if(sel && !sel.dataset.ready){
+    sel.innerHTML = '<option value="">كل التخصصات</option>' +
+      workforceData.rows.map((r,i) => `<option value="${i}">${escapeHtml(r.specialty)}</option>`).join('');
+    sel.dataset.ready = '1';
+    sel.addEventListener('change', renderWorkforce);
+  }
+  const pick = sel && sel.value !== '' ? parseInt(sel.value) : null;
+  const rows = pick === null ? workforceData.rows : [workforceData.rows[pick]];
 
-  // header row 1: hospital names spanning 2 sub-columns each (editable)
-  let head1 = '<th rowspan="2">التخصص</th>';
-  workforceData.hospitals.forEach((h, hIdx) => {
-    head1 += `<th colspan="2" class="wf-hospital-head"><input type="text" class="wf-input wf-hospital-name" data-hosp="${hIdx}" value="${escapeHtml(h)}"></th>`;
-  });
-  head1 += '<th rowspan="2"></th>';
+  // ---- one card per specialty, with a bar per facility ----
+  const wrap = document.getElementById('workforceCards');
+  wrap.innerHTML = rows.map(r => {
+    const items = workforceData.hospitals.map((h,i) => ({
+      name: h,
+      cur: typeof r.current[i] === 'number' ? r.current[i] : 0,
+      need: typeof r.needed[i] === 'number' ? r.needed[i] : 0,
+    })).filter(x => x.cur > 0 || x.need > 0);
 
-  // header row 2: الحالي / الاحتياج sub-labels
-  let head2 = '';
-  workforceData.hospitals.forEach(() => {
-    head2 += '<th class="wf-sublabel">الحالي</th><th class="wf-sublabel wf-needed-col">الاحتياج</th>';
-  });
+    if(items.length === 0) return '';
 
-  let html = `<thead><tr>${head1}</tr><tr>${head2}</tr></thead><tbody>`;
+    const cur = items.reduce((a,b) => a + b.cur, 0);
+    const need = items.reduce((a,b) => a + b.need, 0);
+    const max = Math.max(...items.map(x => x.cur + x.need), 1);
+    items.sort((a,b) => (b.cur + b.need) - (a.cur + a.need));
 
-  workforceData.rows.forEach((r, rIdx) => {
-    html += `<tr data-row="${rIdx}">`;
-    html += `<td><input type="text" class="wf-input wf-specialty" data-row="${rIdx}" value="${escapeHtml(r.specialty)}"></td>`;
-    workforceData.hospitals.forEach((h, cIdx) => {
-      const cur = r.current[cIdx];
-      const need = r.needed[cIdx];
-      const heatClass = (typeof need === 'number' && need > 0) ? 'wf-heat-short' : ((typeof cur === 'number' && cur > 0) ? 'wf-heat-ok' : '');
-      html += `<td class="${heatClass}"><input type="number" class="wf-input wf-cell" data-row="${rIdx}" data-col="${cIdx}" data-field="current" value="${cur === null || cur === undefined ? '' : cur}" placeholder="—"></td>`;
-      html += `<td class="wf-needed-col"><input type="number" class="wf-input wf-cell" data-row="${rIdx}" data-col="${cIdx}" data-field="needed" value="${need === null || need === undefined ? '' : need}" placeholder="—"></td>`;
-    });
-    html += `<td><button class="btn btn-danger-ghost btn-sm" data-delrow="${rIdx}">حذف</button></td>`;
-    html += `</tr>`;
-  });
+    const bars = items.map(x => {
+      const curPct  = (x.cur  / max) * 100;
+      const needPct = (x.need / max) * 100;
+      return `
+        <div class="wf-row">
+          <div class="wf-name">${escapeHtml(x.name)}</div>
+          <div class="wf-bar">
+            <div class="wf-seg wf-seg-cur" style="width:${curPct}%">${x.cur > 0 ? x.cur : ''}</div>
+            ${x.need > 0 ? `<div class="wf-seg wf-seg-need" style="width:${needPct}%">+${x.need}</div>` : ''}
+          </div>
+        </div>`;
+    }).join('');
 
-  const curTotals = computeColTotals('current');
-  const needTotals = computeColTotals('needed');
-  html += '<tr class="wf-totals-row"><td>الإجمالي</td>';
-  workforceData.hospitals.forEach((h, i) => {
-    html += `<td>${curTotals[i]}</td><td class="wf-needed-col">${needTotals[i]}</td>`;
-  });
-  html += '<td></td></tr>';
-  html += '</tbody>';
-  el.innerHTML = html;
-
-  el.querySelectorAll('.wf-cell').forEach(input => {
-    input.addEventListener('change', async (e) => {
-      await ensureIdentity();
-      const r = parseInt(e.target.dataset.row), c = parseInt(e.target.dataset.col), field = e.target.dataset.field;
-      const val = e.target.value.trim();
-      workforceData.rows[r][field][c] = val === '' ? null : Number(val);
-      await saveWorkforceData();
-      renderWorkforce();
-    });
-  });
-  el.querySelectorAll('.wf-specialty').forEach(input => {
-    input.addEventListener('change', async (e) => {
-      await ensureIdentity();
-      const r = parseInt(e.target.dataset.row);
-      workforceData.rows[r].specialty = e.target.value.trim();
-      await saveWorkforceData();
-    });
-  });
-  el.querySelectorAll('.wf-hospital-name').forEach(input => {
-    input.addEventListener('change', async (e) => {
-      await ensureIdentity();
-      const h = parseInt(e.target.dataset.hosp);
-      workforceData.hospitals[h] = e.target.value.trim();
-      await saveWorkforceData();
-      showToast('تم تحديث اسم المنشأة');
-    });
-  });
-  el.querySelectorAll('[data-delrow]').forEach(btn => {
-    btn.addEventListener('click', async () => {
-      if(!confirm('هل تريد حذف هذا التخصص؟')) return;
-      await ensureIdentity();
-      const r = parseInt(btn.dataset.delrow);
-      workforceData.rows.splice(r, 1);
-      await saveWorkforceData();
-      renderWorkforce();
-    });
-  });
-}
-
-const addSpecialtyBtn = document.getElementById('addSpecialtyBtn');
-if(addSpecialtyBtn){
-  addSpecialtyBtn.addEventListener('click', async () => {
-    await ensureIdentity();
-    if(!workforceData) workforceData = await loadWorkforceData();
-    workforceData.rows.push({
-      specialty: 'تخصص جديد',
-      current: workforceData.hospitals.map(() => null),
-      needed: workforceData.hospitals.map(() => null),
-    });
-    await saveWorkforceData();
-    renderWorkforce();
-    showToast('تمت إضافة تخصص جديد');
-  });
-}
-
-const addHospitalBtn = document.getElementById('addHospitalBtn');
-if(addHospitalBtn){
-  addHospitalBtn.addEventListener('click', async () => {
-    await ensureIdentity();
-    if(!workforceData) workforceData = await loadWorkforceData();
-    workforceData.hospitals.push('منشأة جديدة');
-    workforceData.rows.forEach(r => {
-      r.current.push(null);
-      r.needed.push(null);
-    });
-    await saveWorkforceData();
-    renderWorkforce();
-    showToast('تمت إضافة منشأة جديدة — اضغط على اسمها لتعديله');
-  });
-}
-
-const LATEST_WORKFORCE_IMPORT = {"hospitals": ["برج الشمال الطبي", "الأمير عبدالعزيز بن مساعد", "مركز القلب بعرعر", "النساء والولادة بعرعر", "مجمع إرادة والصحة النفسية", "جديدة عرعر", "الرعاية المديدة", "الولادة والأطفال برفحاء", "رفحاء العام", "الشعبة العام", "العويقيلة العام", "طريف العام"], "rows": [{"specialty": "المختبر", "current": [27.0, 21.0, 13.0, 26.0, 7.0, 6.0, 3.0, 6.0, 12.0, 6.0, 7.0, 31.0], "needed": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 9.0, 9.0, 2.0, 3.0, 0.0]}, {"specialty": "الأشعة", "current": [9.0, 8.0, 2.0, 10.0, 2.0, 1.0, 4.0, 11.0, 23.0, 6.0, 5.0, 12.0], "needed": [12.0, 13.0, 5.0, 11.0, 4.0, 3.0, 0.0, 7.0, 0.0, 4.0, 5.0, 7.0]}, {"specialty": "الصيدلة", "current": [27.0, 19.0, 6.0, 18.0, 9.0, 8.0, 5.0, 12.0, 18.0, 4.0, 12.0, 19.0], "needed": [3.0, 6.0, 3.0, 7.0, 3.0, 1.0, 0.0, 8.0, 2.0, 6.0, 0.0, 5.0]}, {"specialty": "العلاج الطبيعي", "current": [16.0, 0.0, 0.0, 4.0, 0.0, 0.0, 4.0, 4.0, 10.0, 2.0, 2.0, 8.0], "needed": [10.0, 2.0, 2.0, 0.0, 2.0, 1.0, 1.0, 0.0, 0.0, 0.0, 2.0, 0.0]}, {"specialty": "العلاج الوظيفي", "current": [3.0, 0.0, 0.0, 3.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 2.0], "needed": [2.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0]}, {"specialty": "الأطراف الصناعية", "current": [2.0, null, null, null, null, null, null, null, null, null, null, null], "needed": [4.0, null, null, null, null, null, null, null, null, null, null, null]}, {"specialty": "النطق والتخاطب", "current": [0.0, 0.0, 0.0, 0.0, 0.0, null, null, 0.0, 0.0, null, null, 1.0], "needed": [2.0, 1.0, 1.0, 2.0, 1.0, null, null, 1.0, 1.0, null, null, 0.0]}, {"specialty": "التغذية العامة", "current": [1.0, 1.0, 0.0, 2.0, 2.0, 0.0, 0.0, 1.0, 3.0, 1.0, 0.0, 0.0], "needed": [null, 3.0, null, null, null, null, null, null, null, null, null, null]}, {"specialty": "التغذية العلاجية", "current": [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "needed": [null, 6.0, 0.0, null, null, null, null, null, null, null, null, null]}, {"specialty": "الأخصائي النفسي", "current": [2.0, 0.0, 0.0, 0.0, 6.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0], "needed": [3.0, 2.0, 0.0, 3.0, 6.0, 2.0, 0.0, 2.0, 3.0, 2.0, 2.0, 0.0]}, {"specialty": "الأخصائي الاجتماعي", "current": [2.0, 1.0, 3.0, 3.0, 11.0, 0.0, 2.0, 0.0, 5.0, 0.0, 0.0, 1.0], "needed": [8.0, 5.0, 1.0, 8.0, 6.0, 2.0, 2.0, 2.0, 2.0, 2.0, 3.0, 8.0]}]};
-const importLatestWorkforceBtn = document.getElementById('importLatestWorkforceBtn');
-if(importLatestWorkforceBtn){
-  importLatestWorkforceBtn.addEventListener('click', async () => {
-    const ok = confirm(
-      'هذا سيستبدل جدول القوى العاملة الحالي بالكامل بأحدث بيانات رسمية (12 منشأة، بالأسماء الصحيحة). ' +
-      'أي تعديلات يدوية سويتها قبل الآن على هذا الجدول ستُفقد. هل تريد المتابعة؟'
-    );
-    if(!ok) return;
-    await ensureIdentity();
-    workforceData = JSON.parse(JSON.stringify(LATEST_WORKFORCE_IMPORT));
-    await saveWorkforceData();
-    renderWorkforce();
-    showToast('تم استيراد أحدث بيانات القوى العاملة بنجاح');
-  });
+    return `
+      <div class="wf-card">
+        <div class="wf-card-head">
+          <h3>${escapeHtml(r.specialty)}</h3>
+          <div class="wf-chips">
+            <span class="wf-chip wf-chip-cur">الحالي ${cur}</span>
+            ${need > 0 ? `<span class="wf-chip wf-chip-need">الاحتياج +${need}</span>` : '<span class="wf-chip wf-chip-ok">مكتمل</span>'}
+          </div>
+        </div>
+        ${bars}
+      </div>`;
+  }).join('') || '<div class="empty-state">لا توجد بيانات</div>';
 }
 
 /* ---------- Projects (editable) ---------- */
