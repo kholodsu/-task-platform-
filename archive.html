@@ -426,28 +426,34 @@ function closeHighlightModal(){
   document.getElementById('highlightModalOverlay').classList.remove('open');
 }
 
+function labRows(list, showFacility){
+  return list.map(d => `
+    <tr>
+      ${showFacility ? `<td>${escapeHtml(d.facility)}</td>` : ''}
+      <td>${escapeHtml(d.pathway)}</td>
+      <td>${escapeHtml(d.name)}</td>
+      <td>${escapeHtml(d.mfr)}</td>
+      <td>${escapeHtml(d.model)}</td>
+      <td>${escapeHtml(d.qty)}</td>
+      <td>${escapeHtml(d.type)}</td>
+      <td>${escapeHtml(d.age)}</td>
+    </tr>
+  `).join('') || `<tr><td colspan="${showFacility ? 8 : 7}"><div class="empty-note">لا توجد نتائج</div></td></tr>`;
+}
+function labHead(showFacility){
+  return `<tr>${showFacility ? '<th>المنشأة</th>' : ''}<th>الفئة</th><th>الجهاز</th><th>الشركة المصنعة</th><th>الموديل</th><th>العدد</th><th>النوع</th><th>العمر</th></tr>`;
+}
+function labFilter(fac, q){
+  q = (q||'').toLowerCase();
+  return LAB_EQUIPMENT.filter(d =>
+    (!fac || d.facility === fac) &&
+    (!q || d.name.toLowerCase().includes(q) || d.mfr.toLowerCase().includes(q) || d.pathway.toLowerCase().includes(q))
+  );
+}
+
 function renderLabEquipmentCard(){
   const facilities = [...new Set(LAB_EQUIPMENT.map(d => d.facility))].sort();
-  const rowsHtml = (filterFacility, q) => {
-    q = (q||'').toLowerCase();
-    const list = LAB_EQUIPMENT.filter(d =>
-      (!filterFacility || d.facility === filterFacility) &&
-      (!q || d.name.toLowerCase().includes(q) || d.mfr.toLowerCase().includes(q) || d.pathway.toLowerCase().includes(q))
-    );
-    return { html: list.map(d => `
-      <tr>
-        <td>${escapeHtml(d.facility)}</td>
-        <td>${escapeHtml(d.pathway)}</td>
-        <td>${escapeHtml(d.name)}</td>
-        <td>${escapeHtml(d.mfr)}</td>
-        <td>${escapeHtml(d.model)}</td>
-        <td>${escapeHtml(d.qty)}</td>
-        <td>${escapeHtml(d.type)}</td>
-        <td>${escapeHtml(d.age)}</td>
-      </tr>
-    `).join('') || `<tr><td colspan="8"><div class="empty-note">لا توجد نتائج</div></td></tr>`, count: list.length };
-  };
-  const first = rowsHtml('', '');
+  const list = labFilter('', '');
   return `
     <div class="card">
       <h3>${iconBadge("🔬","badge-mint")} أجهزة المختبرات</h3>
@@ -458,11 +464,11 @@ function renderLabEquipmentCard(){
         </select>
         <input type="text" id="labSearchInput" placeholder="ابحث باسم الجهاز أو الشركة المصنعة...">
       </div>
-      <div class="device-count" id="labDeviceCount">${first.count} جهاز</div>
+      <div class="device-count" id="labDeviceCount">${list.length} جهاز</div>
       <div class="table-scroll" style="max-height:520px; overflow-y:auto;">
         <table>
-          <thead><tr><th>المنشأة</th><th>الفئة</th><th>الجهاز</th><th>الشركة المصنعة</th><th>الموديل</th><th>العدد</th><th>النوع</th><th>العمر</th></tr></thead>
-          <tbody id="labEquipmentBody">${first.html}</tbody>
+          <thead id="labEquipmentHead">${labHead(true)}</thead>
+          <tbody id="labEquipmentBody">${labRows(list, true)}</tbody>
         </table>
       </div>
     </div>
@@ -474,36 +480,41 @@ function wireLabEquipmentFilters(){
   const searchInput = document.getElementById('labSearchInput');
   if(!facilitySel) return;
   const update = () => {
-    const q = searchInput.value.trim().toLowerCase();
     const fac = facilitySel.value;
-    const list = LAB_EQUIPMENT.filter(d =>
-      (!fac || d.facility === fac) &&
-      (!q || d.name.toLowerCase().includes(q) || d.mfr.toLowerCase().includes(q) || d.pathway.toLowerCase().includes(q))
-    );
-    document.getElementById('labDeviceCount').textContent = list.length + ' جهاز';
-    document.getElementById('labEquipmentBody').innerHTML = list.map(d => `
-      <tr>
-        <td>${escapeHtml(d.facility)}</td>
-        <td>${escapeHtml(d.pathway)}</td>
-        <td>${escapeHtml(d.name)}</td>
-        <td>${escapeHtml(d.mfr)}</td>
-        <td>${escapeHtml(d.model)}</td>
-        <td>${escapeHtml(d.qty)}</td>
-        <td>${escapeHtml(d.type)}</td>
-        <td>${escapeHtml(d.age)}</td>
-      </tr>
-    `).join('') || `<tr><td colspan="8"><div class="empty-note">لا توجد نتائج</div></td></tr>`;
+    const list = labFilter(fac, searchInput.value.trim());
+    // once a single facility is picked, repeating its name on every row is noise
+    const showFacility = !fac;
+    document.getElementById('labDeviceCount').textContent =
+      list.length + ' جهاز' + (fac ? ' — ' + fac : '');
+    document.getElementById('labEquipmentHead').innerHTML = labHead(showFacility);
+    document.getElementById('labEquipmentBody').innerHTML = labRows(list, showFacility);
   };
   facilitySel.addEventListener('change', update);
   searchInput.addEventListener('input', update);
 }
 
+function radRows(list, showFacility){
+  return list.map(d => `
+    <tr>
+      ${showFacility ? `<td>${escapeHtml(d.facility)}</td>` : ''}
+      <td>${escapeHtml(d.name)}</td>
+      <td>${d.qty}</td>
+    </tr>
+  `).join('') || `<tr><td colspan="${showFacility ? 3 : 2}"><div class="empty-note">لا توجد نتائج</div></td></tr>`;
+}
+function radHead(showFacility){
+  return `<tr>${showFacility ? '<th>المنشأة</th>' : ''}<th>الجهاز</th><th>العدد</th></tr>`;
+}
+function radFilter(fac, q){
+  q = (q||'').toLowerCase();
+  return RADIOLOGY_DEVICES.filter(d =>
+    (!fac || d.facility === fac) && (!q || d.name.toLowerCase().includes(q))
+  );
+}
+
 function renderRadiologyEquipmentCard(){
   const facilities = [...new Set(RADIOLOGY_DEVICES.map(d => d.facility))];
-  const list0 = RADIOLOGY_DEVICES;
-  const rowsHtml = list0.map(d => `
-    <tr><td>${escapeHtml(d.facility)}</td><td>${escapeHtml(d.name)}</td><td>${d.qty}</td></tr>
-  `).join('') || `<tr><td colspan="3"><div class="empty-note">لا توجد نتائج</div></td></tr>`;
+  const list = radFilter('', '');
   return `
     <div class="card">
       <h3>${iconBadge("🩻","badge-mint")} أجهزة الأشعة</h3>
@@ -514,11 +525,11 @@ function renderRadiologyEquipmentCard(){
         </select>
         <input type="text" id="radSearchInput" placeholder="ابحث باسم الجهاز...">
       </div>
-      <div class="device-count" id="radDeviceCount">${list0.length} جهاز</div>
+      <div class="device-count" id="radDeviceCount">${list.length} جهاز</div>
       <div class="table-scroll" style="max-height:460px; overflow-y:auto;">
         <table>
-          <thead><tr><th>المنشأة</th><th>الجهاز</th><th>العدد</th></tr></thead>
-          <tbody id="radEquipmentBody">${rowsHtml}</tbody>
+          <thead id="radEquipmentHead">${radHead(true)}</thead>
+          <tbody id="radEquipmentBody">${radRows(list, true)}</tbody>
         </table>
       </div>
     </div>
@@ -530,15 +541,13 @@ function wireRadiologyEquipmentFilters(){
   const searchInput = document.getElementById('radSearchInput');
   if(!facilitySel) return;
   const update = () => {
-    const q = searchInput.value.trim().toLowerCase();
     const fac = facilitySel.value;
-    const list = RADIOLOGY_DEVICES.filter(d =>
-      (!fac || d.facility === fac) && (!q || d.name.toLowerCase().includes(q))
-    );
-    document.getElementById('radDeviceCount').textContent = list.length + ' جهاز';
-    document.getElementById('radEquipmentBody').innerHTML = list.map(d => `
-      <tr><td>${escapeHtml(d.facility)}</td><td>${escapeHtml(d.name)}</td><td>${d.qty}</td></tr>
-    `).join('') || `<tr><td colspan="3"><div class="empty-note">لا توجد نتائج</div></td></tr>`;
+    const list = radFilter(fac, searchInput.value.trim());
+    const showFacility = !fac;
+    document.getElementById('radDeviceCount').textContent =
+      list.length + ' جهاز' + (fac ? ' — ' + fac : '');
+    document.getElementById('radEquipmentHead').innerHTML = radHead(showFacility);
+    document.getElementById('radEquipmentBody').innerHTML = radRows(list, showFacility);
   };
   facilitySel.addEventListener('change', update);
   searchInput.addEventListener('input', update);
