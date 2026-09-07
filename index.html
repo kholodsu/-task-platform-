@@ -655,7 +655,7 @@ function renderFacilities(){
       activeFacility = tile.dataset.fac;
       renderFacilities();
       renderFacilityDetail();
-      document.getElementById('facDetail').scrollIntoView({behavior:'smooth', block:'nearest'});
+      document.getElementById('facDetail').scrollIntoView({behavior:'smooth', block:'start'});
     });
   });
 
@@ -707,6 +707,10 @@ function renderFacilityDetail(){
   `).join('') || '<div class="empty-state">لا توجد منجزات مسجّلة لهذه المنشأة</div>';
 
   el.innerHTML = `
+    <div class="wf-card-head" style="background:var(--blue-500); padding:14px 16px; border-radius:12px; margin-bottom:16px; border-bottom:none;">
+      <h3 style="color:#fff;">🏥 ${escapeHtml(p.name)}</h3>
+      <button id="facCloseBtn" style="border:none; background:rgba(255,255,255,0.22); color:#fff; font-size:11.5px; font-weight:800; padding:7px 14px; border-radius:8px; cursor:pointer;">▲ إغلاق</button>
+    </div>
     <div class="wf-card" style="margin-bottom:14px;">
       <div class="wf-card-head"><h3>👥 القوى العاملة</h3></div>
       ${wfRows}
@@ -732,6 +736,15 @@ function renderFacilityDetail(){
       ${achHtml}
     </div>
   `;
+
+  const closeBtn = document.getElementById('facCloseBtn');
+  if(closeBtn){
+    closeBtn.addEventListener('click', () => {
+      activeFacility = null;
+      renderFacilities();
+      document.getElementById('facTiles').scrollIntoView({behavior:'smooth', block:'start'});
+    });
+  }
 }
 
 /* ---------- Projects (editable) ---------- */

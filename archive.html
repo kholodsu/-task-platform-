@@ -281,6 +281,12 @@
   .pj-tile:not(.pj-open) .pj-more::after{content:" ▾";}
 
   .pj-detail{margin-top:20px; padding-top:20px; border-top:2px dashed var(--line);}
+  .pj-detail-head{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
+    margin-bottom:18px; padding:14px 16px; border-radius:12px; background:var(--accent);}
+  .pj-detail-head-title{color:#fff; font-size:14.5px; font-weight:900; display:flex; align-items:center; gap:8px;}
+  .pj-detail-close{border:none; background:rgba(255,255,255,0.22); color:#fff; font-size:11.5px; font-weight:800;
+    padding:7px 14px; border-radius:8px; cursor:pointer; white-space:nowrap; flex:0 0 auto;}
+  .pj-detail-close:hover{background:rgba(255,255,255,0.32);}
   .pj-kpis{display:grid; grid-template-columns:repeat(auto-fit, minmax(140px,1fr)); gap:12px; margin-bottom:24px;}
   .pj-kpi{
     background:linear-gradient(135deg, rgba(234,244,250,0.85), rgba(255,255,255,0.6));
@@ -895,6 +901,10 @@ function projectSection(sec){
 function projectDetail(p){
   return `
     <div class="pj-detail" id="pjd-${escapeHtml(p.id)}" style="display:none;">
+      <div class="pj-detail-head">
+        <div class="pj-detail-head-title"><span>${p.icon}</span> ${escapeHtml(p.title)}</div>
+        <button class="pj-detail-close" data-close-pj="${escapeHtml(p.id)}">▲ إغلاق</button>
+      </div>
       <div class="pj-kpis">${p.kpis.map(k => `
         <div class="pj-kpi"><div class="pj-kpi-v">${escapeHtml(k.value)}</div><div class="pj-kpi-l">${escapeHtml(k.label)}</div></div>`).join('')}</div>
       ${p.sections.map(projectSection).join('')}
@@ -923,6 +933,11 @@ function renderProjectsCard(deptId){
     </div>`;
 }
 
+function closeAllDetails(kind){
+  document.querySelectorAll('.' + kind + '-detail').forEach(p => p.style.display = 'none');
+  document.querySelectorAll('.' + kind + '-tile').forEach(t => t.classList.remove('pj-open'));
+}
+
 function wireProjectTiles(){
   document.querySelectorAll('.pj-tile').forEach(tile => {
     tile.addEventListener('click', () => {
@@ -930,13 +945,23 @@ function wireProjectTiles(){
       const panel = document.getElementById('pjd-' + id);
       const opening = panel.style.display === 'none';
       // only one project open at a time keeps the page readable
-      document.querySelectorAll('.pj-detail').forEach(p => p.style.display = 'none');
-      document.querySelectorAll('.pj-tile').forEach(t => t.classList.remove('pj-open'));
+      closeAllDetails('pj');
       if(opening){
         panel.style.display = 'block';
         tile.classList.add('pj-open');
-        panel.scrollIntoView({behavior:'smooth', block:'nearest'});
+        panel.scrollIntoView({behavior:'smooth', block:'start'});
+      } else {
+        tile.scrollIntoView({behavior:'smooth', block:'center'});
       }
+    });
+  });
+  document.querySelectorAll('[data-close-pj]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const id = btn.dataset.closePj;
+      const tile = document.querySelector('.pj-tile[data-pj="' + id + '"]');
+      closeAllDetails('pj');
+      if(tile) tile.scrollIntoView({behavior:'smooth', block:'center'});
     });
   });
 }
@@ -962,6 +987,10 @@ function visitDetail(v){
 
   return `
     <div class="vs-detail" id="vsd-${escapeHtml(v.id)}" style="display:none;">
+      <div class="pj-detail-head">
+        <div class="pj-detail-head-title"><span>📋</span> ${escapeHtml(v.facility)} — ${escapeHtml(v.date)}</div>
+        <button class="pj-detail-close" data-close-vs="${escapeHtml(v.id)}">▲ إغلاق</button>
+      </div>
       ${v.pdf ? `
       <div class="highlight-item highlight-clickable vs-pdf-link" data-href="${escapeHtml(v.pdf)}">
         <h4>📄 التقرير الأصلي</h4>
@@ -1033,13 +1062,23 @@ function wireVisitTiles(){
     tile.addEventListener('click', () => {
       const panel = document.getElementById('vsd-' + tile.dataset.vs);
       const opening = panel.style.display === 'none';
-      document.querySelectorAll('.vs-detail').forEach(p => p.style.display = 'none');
-      document.querySelectorAll('.vs-tile').forEach(t => t.classList.remove('pj-open'));
+      closeAllDetails('vs');
       if(opening){
         panel.style.display = 'block';
         tile.classList.add('pj-open');
-        panel.scrollIntoView({behavior:'smooth', block:'nearest'});
+        panel.scrollIntoView({behavior:'smooth', block:'start'});
+      } else {
+        tile.scrollIntoView({behavior:'smooth', block:'center'});
       }
+    });
+  });
+  document.querySelectorAll('[data-close-vs]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const id = btn.dataset.closeVs;
+      const tile = document.querySelector('.vs-tile[data-vs="' + id + '"]');
+      closeAllDetails('vs');
+      if(tile) tile.scrollIntoView({behavior:'smooth', block:'center'});
     });
   });
 }
