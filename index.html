@@ -300,9 +300,70 @@
   }
   .archive-item-name{font-weight:700; font-size:14px; color:var(--gray-900);}
   .staff-card .scontact{font-size:12px; color:var(--gray-700); display:flex; align-items:center; gap:6px; margin-top:4px;}
+  .gate-overlay{
+    position:fixed; inset:0; z-index:99999; display:flex; align-items:center; justify-content:center;
+    background:linear-gradient(160deg, var(--blue-900) 0%, var(--blue-700) 55%, var(--blue-600) 100%);
+    padding:20px;
+  }
+  .gate-box{
+    width:100%; max-width:380px; text-align:center; padding:36px 30px;
+    background:var(--glass-bg-strong); backdrop-filter:var(--glass-blur); -webkit-backdrop-filter:var(--glass-blur);
+    border:1px solid var(--glass-border); border-radius:var(--radius-lg); box-shadow:var(--shadow);
+  }
+  .gate-logo{font-size:40px; line-height:1; margin-bottom:14px;}
+  .gate-box h2{margin:0 0 8px; font-size:19px; font-weight:900; color:var(--blue-700);}
+  .gate-box p{margin:0 0 20px; font-size:12.5px; color:var(--gray-700); line-height:1.6;}
+  .gate-box input{
+    width:100%; box-sizing:border-box; padding:12px 14px; border-radius:12px; border:1px solid var(--glass-border);
+    background:rgba(255,255,255,0.8); font-size:14px; font-family:inherit; text-align:center; letter-spacing:2px;
+    margin-bottom:12px;
+  }
+  .gate-box input:focus{outline:none; border-color:var(--blue-500);}
+  .gate-box button{
+    width:100%; padding:12px; border:none; border-radius:12px; background:var(--blue-500); color:#fff;
+    font-size:14px; font-weight:800; font-family:inherit; cursor:pointer;
+  }
+  .gate-box button:hover{background:var(--blue-600);}
+  .gate-error{margin-top:12px; font-size:12px; color:var(--red); font-weight:700; display:none;}
 </style>
 </head>
 <body>
+  <div id="gateOverlay" class="gate-overlay">
+    <div class="gate-box">
+      <div class="gate-logo">🔒</div>
+      <h2>الدخول للمنصة</h2>
+      <p>هذه المنصة خاصة بفريق إدارة الخدمات الصحية المساندة</p>
+      <input type="password" id="gatePassword" placeholder="كلمة المرور" autocomplete="off">
+      <button id="gateSubmit" type="button">دخول</button>
+      <div id="gateError" class="gate-error">كلمة المرور غير صحيحة</div>
+    </div>
+  </div>
+  <script>
+  (function(){
+    var PASS = "123098";
+    var KEY = "n1cluster_gate_ok";
+    var overlay = document.getElementById('gateOverlay');
+    function unlock(){
+      overlay.style.display = 'none';
+      document.documentElement.style.overflow = '';
+    }
+    try {
+      if(localStorage.getItem(KEY) === '1'){ unlock(); return; }
+    } catch(e){}
+    document.documentElement.style.overflow = 'hidden';
+    function tryLogin(){
+      var val = document.getElementById('gatePassword').value;
+      if(val === PASS){
+        try{ localStorage.setItem(KEY, '1'); }catch(e){}
+        unlock();
+      } else {
+        document.getElementById('gateError').style.display = 'block';
+      }
+    }
+    document.getElementById('gateSubmit').addEventListener('click', tryLogin);
+    document.getElementById('gatePassword').addEventListener('keydown', function(e){ if(e.key === 'Enter') tryLogin(); });
+  })();
+  </script>
   <div class="topbar">
     <div class="topbar-inner">
       <div class="brand">
