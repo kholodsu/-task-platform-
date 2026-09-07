@@ -202,6 +202,52 @@
   .wfd-meta{font-size:10.5px; font-weight:700; color:var(--amber); background:var(--amber-bg); padding:4px 10px; border-radius:999px;}
   .wfd-empty{font-size:11.5px; color:var(--ink-faint);}
 
+  /* ---------- field visits ---------- */
+  .vs-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(280px,1fr)); gap:14px;}
+  .vs-tile{
+    background:rgba(255,255,255,0.55); backdrop-filter:blur(18px) saturate(180%); -webkit-backdrop-filter:blur(18px) saturate(180%);
+    border:1px solid var(--glass-border); border-radius:16px; padding:18px 20px; cursor:pointer;
+    border-top:3px solid var(--accent);
+    box-shadow:0 4px 16px rgba(20,80,130,0.07), inset 0 1px 0 rgba(255,255,255,0.7);
+    transition:all .2s cubic-bezier(.4,0,.2,1);
+  }
+  .vs-tile:hover{transform:translateY(-3px); box-shadow:0 12px 30px rgba(20,80,130,0.14);}
+  .vs-tile.pj-open{background:var(--accent); border-color:var(--accent); transform:translateY(-3px); box-shadow:0 14px 34px rgba(20,80,130,0.28);}
+  .vs-tile.pj-open .vs-fac, .vs-tile.pj-open .vs-sum, .vs-tile.pj-open .pj-more, .vs-tile.pj-open .vs-date{color:#fff;}
+  .vs-tile.pj-open .vs-pct{background:rgba(255,255,255,0.25); color:#fff;}
+  .vs-tile-top{display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;}
+  .vs-pct{background:var(--green-bg); color:var(--green); font-size:14px; font-weight:900; padding:5px 13px; border-radius:999px;}
+  .vs-date{font-size:11px; font-weight:700; color:var(--ink-faint);}
+  .vs-fac{font-size:14.5px; font-weight:800; color:var(--ink); margin-bottom:6px; line-height:1.4;}
+  .vs-sum{font-size:12px; color:var(--ink-soft); line-height:1.7;}
+
+  .vs-detail{margin-top:20px; padding-top:20px; border-top:2px dashed var(--line);}
+  .vs-meter{display:flex; height:14px; border-radius:7px; overflow:hidden; background:rgba(238,241,244,0.8);}
+  .vs-meter-fill{height:100%;}
+  .vs-meter-fill.vs-ok{background:var(--green);}
+  .vs-meter-fill.vs-partial{background:var(--amber);}
+  .vs-meter-fill.vs-no{background:var(--red);}
+  .vs-legend{display:flex; gap:16px; flex-wrap:wrap; margin-top:10px; font-size:11.5px; font-weight:700; color:var(--ink-soft);}
+  .vs-legend span{display:inline-flex; align-items:center; gap:6px;}
+  .vs-key{width:11px; height:11px; border-radius:3px; display:inline-block;}
+  .vs-key.vs-ok{background:var(--green);} .vs-key.vs-partial{background:var(--amber);} .vs-key.vs-no{background:var(--red);}
+
+  .vs-group{margin-bottom:16px;}
+  .vs-group-name{font-size:12px; font-weight:800; color:var(--accent); margin-bottom:8px;}
+  .vs-item{display:flex; align-items:flex-start; gap:10px; padding:9px 12px; border-radius:10px; margin-bottom:5px; background:rgba(255,255,255,0.45); border:1px solid var(--glass-border);}
+  .vs-dot{flex:0 0 auto; width:9px; height:9px; border-radius:50%; margin-top:5px;}
+  .vs-item.vs-ok .vs-dot{background:var(--green);}
+  .vs-item.vs-partial .vs-dot{background:var(--amber);}
+  .vs-item.vs-no .vs-dot{background:var(--red);}
+  .vs-q{flex:1; font-size:12px; font-weight:700; color:var(--ink); line-height:1.6;}
+  .vs-a{flex:0 0 auto; max-width:52%; font-size:11.5px; color:var(--ink-soft); text-align:left; line-height:1.6;}
+  .vs-item.vs-no .vs-a{color:var(--red); font-weight:700;}
+  .vs-item.vs-partial .vs-a{color:var(--amber); font-weight:700;}
+  @media (max-width:640px){
+    .vs-item{flex-wrap:wrap;}
+    .vs-a{max-width:100%; text-align:right; padding-inline-start:19px;}
+  }
+
   /* ---------- department projects ---------- */
   .pj-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(260px,1fr)); gap:14px;}
   .pj-tile{
@@ -368,6 +414,7 @@ const RADIOLOGY_DEVICES = [{"facility": "برج الشمال الطبي", "name"
 const WORKFORCE_ARCHIVE = {"hospitals": ["برج الشمال الطبي", "الأمير عبدالعزيز بن مساعد", "مركز القلب بعرعر", "النساء والولادة بعرعر", "مجمع إرادة والصحة النفسية", "جديدة عرعر", "الرعاية المديدة", "الولادة والأطفال برفحاء", "رفحاء العام", "الشعبة العام", "العويقيلة العام", "طريف العام"], "rows": [{"specialty": "المختبر", "current": [27.0, 21.0, 13.0, 26.0, 7.0, 6.0, 3.0, 6.0, 12.0, 6.0, 7.0, 31.0], "needed": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 9.0, 9.0, 2.0, 3.0, 0.0]}, {"specialty": "الأشعة", "current": [9.0, 8.0, 2.0, 10.0, 2.0, 1.0, 4.0, 11.0, 23.0, 6.0, 5.0, 12.0], "needed": [12.0, 13.0, 5.0, 11.0, 4.0, 3.0, 0.0, 7.0, 0.0, 4.0, 5.0, 7.0]}, {"specialty": "الصيدلة", "current": [27.0, 19.0, 6.0, 18.0, 9.0, 8.0, 5.0, 12.0, 18.0, 4.0, 12.0, 19.0], "needed": [3.0, 6.0, 3.0, 7.0, 3.0, 1.0, 0.0, 8.0, 2.0, 6.0, 0.0, 5.0]}, {"specialty": "العلاج الطبيعي", "current": [16.0, 0.0, 0.0, 4.0, 0.0, 0.0, 4.0, 4.0, 10.0, 2.0, 2.0, 8.0], "needed": [10.0, 2.0, 2.0, 0.0, 2.0, 1.0, 1.0, 0.0, 0.0, 0.0, 2.0, 0.0]}, {"specialty": "العلاج الوظيفي", "current": [3.0, 0.0, 0.0, 3.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 2.0], "needed": [2.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0]}, {"specialty": "الأطراف الصناعية", "current": [2.0, null, null, null, null, null, null, null, null, null, null, null], "needed": [4.0, null, null, null, null, null, null, null, null, null, null, null]}, {"specialty": "النطق والتخاطب", "current": [0.0, 0.0, 0.0, 0.0, 0.0, null, null, 0.0, 0.0, null, null, 1.0], "needed": [2.0, 1.0, 1.0, 2.0, 1.0, null, null, 1.0, 1.0, null, null, 0.0]}, {"specialty": "التغذية العامة", "current": [1.0, 1.0, 0.0, 2.0, 2.0, 0.0, 0.0, 1.0, 3.0, 1.0, 0.0, 0.0], "needed": [null, 3.0, null, null, null, null, null, null, null, null, null, null]}, {"specialty": "التغذية العلاجية", "current": [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "needed": [null, 6.0, 0.0, null, null, null, null, null, null, null, null, null]}, {"specialty": "الأخصائي النفسي", "current": [2.0, 0.0, 0.0, 0.0, 6.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0], "needed": [3.0, 2.0, 0.0, 3.0, 6.0, 2.0, 0.0, 2.0, 3.0, 2.0, 2.0, 0.0]}, {"specialty": "الأخصائي الاجتماعي", "current": [2.0, 1.0, 3.0, 3.0, 11.0, 0.0, 2.0, 0.0, 5.0, 0.0, 0.0, 1.0], "needed": [8.0, 5.0, 1.0, 8.0, 6.0, 2.0, 2.0, 2.0, 2.0, 2.0, 3.0, 8.0]}]};
 const WORKFORCE_DETAILED = {"labs": {"columns": ["فني", "اخصائي", "اخصائي أول", "متسربين خارج المختبر", "موفدين ومبتعثين", "المجموع الكلي"], "rows": [{"facility": "الأمير عبدالعزيز بن مساعد", "values": [3, 13, 2, 2, 2, 22]}, {"facility": "برج الشمال الطبي", "values": [10, 13, 1, 1, 2, 27]}, {"facility": "النساء والولادة والأطفال بعرعر", "values": [6, 15, 1, 3, 1, 26]}, {"facility": "مجمع إرادة للصحة النفسية", "values": [5, 2, null, null, null, 7]}, {"facility": "جديدة عرعر", "values": [3, 2, null, null, 1, 6]}, {"facility": "مركز الأمير عبدالله لطب وجراحة القلب", "values": [5, 6, null, 1, null, 13]}, {"facility": "الرعاية المديدة", "values": [2, 1, null, null, null, 3]}, {"facility": "طريف العام", "values": [17, 6, 2, 5, 1, 31]}, {"facility": "العويقيلة", "values": [6, 1, null, null, null, 7]}, {"facility": "شعبة نصاب", "values": [3, 3, null, null, null, 6]}, {"facility": "رفحاء العام", "values": [7, 3, null, 1, 1, 12]}, {"facility": "النساء والولادة والأطفال برفحاء", "values": [2, 4, null, null, null, 6]}, {"facility": "المختبر الإقليمي", "values": [1, 25, 4, 1, 4, 35]}, {"facility": "بنك الدم المساند", "values": [6, 6, 1, 1, null, 14]}], "totalCol": 5}, "pharmacy": {"columns": ["قسم الصيدلية", "مراقبة المخزون والتموين الطبي", "متسربين (داخل الجهة)", "الدعم", "المجموع"], "rows": [{"facility": "برج الشمال الطبي", "values": [25, 6, 14, null, 45]}, {"facility": "الأمير عبدالعزيز بن مساعد", "values": [18, 5, 9, null, 32]}, {"facility": "النساء والولادة والأطفال بعرعر", "values": [18, 6, 5, 1, 30]}, {"facility": "جديدة عرعر", "values": [7, 0, 2, null, 9]}, {"facility": "مجمع إرادة والصحة النفسية", "values": [6, 3, 3, null, 12]}, {"facility": "الرعاية المديدة", "values": [5, 4, 2, 1, 12]}, {"facility": "مركز الأمير عبدالله لطب وجراحة القلب", "values": [6, 2, 1, 1, 10]}, {"facility": "رفحاء المركزي", "values": [18, 5, 4, null, 27]}, {"facility": "النساء والولادة والأطفال برفحاء", "values": [11, 3, 1, null, 15]}, {"facility": "طريف العام", "values": [19, 8, 15, null, 42]}, {"facility": "العويقيلة العام", "values": [11, 2, 5, null, 18]}, {"facility": "شعبة نصاب العام", "values": [4, 2, 1, null, 7]}], "totalCol": 4}, "mental": {"columns": ["طبيب نفسي", "اخصائي نفسي", "اخصائي اجتماعي", "متسربين"], "rows": [{"facility": "برج الشمال الطبي", "values": [0, 2, 2, null]}, {"facility": "الأمير عبدالعزيز بن مساعد", "values": [0, 0, 2, 1]}, {"facility": "النساء والولادة بعرعر", "values": [0, 0, 3, null]}, {"facility": "الرعاية المديدة", "values": [0, 1, 2, null]}, {"facility": "مركز الأمير عبدالله لجراحة القلب", "values": [0, 0, 3, null]}, {"facility": "مجمع إرادة للصحة النفسية", "values": [12, 6, 12, null]}, {"facility": "رفحاء العام", "values": [2, 1, 4, null]}, {"facility": "النساء والأطفال برفحاء", "values": [0, 0, 0, null]}, {"facility": "طريف العام", "values": [1, 0, 1, null]}, {"facility": "العويقيلة العام", "values": [0, 1, 0, null]}, {"facility": "الشعبة العام", "values": [0, 0, 0, null]}, {"facility": "جديدة عرعر العام", "values": [0, 0, 0, null]}], "sumCols": [0, 1, 2]}, "nutrition": {"columns": ["تغذية عامة", "تغذية علاجية"], "rows": [{"facility": "النساء والولادة بعرعر", "values": [2, 0]}, {"facility": "برج الشمال الطبي", "values": [1, 1]}, {"facility": "الأمير عبدالعزيز بن مساعد", "values": [2, 0]}, {"facility": "الرعاية المديدة", "values": [0, 0]}, {"facility": "مركز الأمير عبدالله لطب وجراحة القلب", "values": [0, 0]}, {"facility": "مجمع إرادة والصحة النفسية", "values": [2, 0]}, {"facility": "رفحاء العام", "values": [3, 0]}, {"facility": "النساء والولادة والأطفال برفحاء", "values": [1, 0]}, {"facility": "الشعبة العام", "values": [1, 0]}, {"facility": "طريف العام", "values": [0, 0]}, {"facility": "جديدة عرعر العام", "values": [0, 0]}, {"facility": "العويقيلة العام", "values": [1, 0]}], "sumCols": [0, 1]}, "rehab": {"columns": ["طب طبيعي — استشاري", "طب طبيعي — طبيب نائب", "طب طبيعي — اخصائي", "طب طبيعي — اخصائي أول", "علاج طبيعي — اخصائي أول", "علاج طبيعي — اخصائي", "علاج طبيعي — فني", "علاج وظيفي — اخصائي أول", "علاج وظيفي — اخصائي", "نطق وتخاطب — اخصائي أول", "نطق وتخاطب — اخصائي", "أطراف صناعية — اخصائي أول", "أطراف صناعية — اخصائي", "أطراف صناعية — فني", "متسربين", "موفدين ومبتعثين"], "rows": [{"facility": "برج الشمال الطبي", "values": [2, 0, 0, 2, 1, 12, 0, 0, 2, 0, 0, 0, 2, 0, null, 3]}, {"facility": "النساء والولادة والأطفال بعرعر", "values": [0, 0, 1, 0, 0, 4, 0, 0, 3, 0, 0, 0, 0, 0, null, null]}, {"facility": "طريف العام", "values": [0, 0, 0, 0, 1, 7, 0, 0, 2, 0, 1, 0, 0, 0, 1, null]}, {"facility": "رفحاء العام", "values": [0, 1, 0, 0, 0, 4, 2, 0, 1, 0, 0, 0, 0, 0, 1, 3]}, {"facility": "الشعبة العام", "values": [0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, null, null]}, {"facility": "الرعاية المديدة", "values": [0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 1, null]}, {"facility": "العويقيلة العام", "values": [0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, null, null]}, {"facility": "النساء والولادة والأطفال برفحاء", "values": [0, 0, 0, 0, 0, 3, 0, 0, 1, 0, 0, 0, 0, 0, null, 1]}], "sumCols": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]}, "radiology": {"columns": ["طبيب أشعة", "اخصائي", "فني", "اخصائي أول", "خارج قسم الأشعة"], "rows": [{"facility": "برج الشمال الطبي", "values": [8, 3, 4, null, null]}, {"facility": "الأمير عبدالعزيز بن مساعد", "values": [7, 2, 4, null, 1]}, {"facility": "النساء والولادة والأطفال بعرعر", "values": [7, 6, 4, null, null]}, {"facility": "جديدة عرعر", "values": [1, null, 1, null, 1]}, {"facility": "مجمع إرادة والصحة النفسية", "values": [null, null, 2, null, null]}, {"facility": "الرعاية المديدة", "values": [null, 1, 2, null, 1]}, {"facility": "مركز الأمير عبدالله لطب وجراحة القلب", "values": [2, null, 4, null, null]}, {"facility": "رفحاء المركزي", "values": [5, 14, 7, 1, 5]}, {"facility": "النساء والولادة والأطفال برفحاء", "values": [3, 7, null, null, 1]}, {"facility": "طريف العام", "values": [5, null, 9, null, 4]}, {"facility": "العويقيلة العام", "values": [1, 2, 3, null, null]}, {"facility": "شعبة نصاب العام", "values": [1, 6, null, null, null]}]}};
 const DEPT_PROJECTS = {"rehab": [{"id": "virtual-speech", "title": "العيادة الافتراضية لعلاج النطق والتخاطب", "status": "قائم", "statusLabel": "مشروع قائم", "icon": "🗣️", "tagline": "جلسات تقييم وعلاج النطق والتخاطب عن بُعد بإشراف أخصائيين مؤهلين، دون الحاجة للحضور إلى المستشفى.", "kpis": [{"value": "18+", "label": "الفئة العمرية المستهدفة"}, {"value": "4", "label": "مراحل التنفيذ"}, {"value": "شهران", "label": "مدة المرحلة التجريبية"}, {"value": "1", "label": "منشأة في المرحلة التجريبية"}], "sections": [{"heading": "من يستحق التحويل للخدمة؟", "note": "يجب توفر جميع المعايير التالية في المريض", "type": "cards", "items": [{"icon": "🩺", "title": "حالة الحالة المرضية", "text": "حالات جديدة أو نشطة سريريًا تحتاج تدخل نطق وتخاطب"}, {"icon": "👤", "title": "العمر", "text": "المرضى بعمر 18 سنة فأكثر"}, {"icon": "🎯", "title": "الملاءمة السريرية", "text": "صعوبات نطق مناسبة للتدخل عن بُعد"}, {"icon": "🕐", "title": "مدة الحالة", "text": "تم تشخيص الحالة خلال آخر 3 سنوات"}, {"icon": "💻", "title": "الملاءمة الافتراضية", "text": "القدرة على المشاركة الفعّالة في جلسات التقييم والعلاج عن بُعد"}, {"icon": "📋", "title": "متطلبات العلاج", "text": "لا تتطلب تقنيات يدوية أو تدخل حركي مباشر"}]}, {"heading": "متى لا يتم تحويل المريض للعيادة الافتراضية؟", "type": "exclusions", "items": ["يحتاج تقنيات علاجية يدوية أو تدخل مباشر", "يحتاج تدخلًا مكثفًا حضوريًا أو مساعدة جسدية", "لديه احتياجات سريرية لا يمكن تقييمها أو إدارتها عن بُعد بشكل مناسب", "لا يستوفي معايير العمر أو الحالة السريرية المحددة"]}, {"heading": "مراحل تنفيذ المشروع", "note": "يتم التوسع تدريجيًا بعد استكمال كل مرحلة ومعالجة الملاحظات التشغيلية", "type": "timeline", "items": [{"n": "١", "title": "المرحلة التجريبية", "duration": "شهران", "text": "استقبال حالات البالغين من مستشفى برج الشمال الطبي فقط، وتقييم آلية التشغيل ورصد التحديات وقياس مؤشرات الأداء قبل التوسع."}, {"n": "٢", "title": "التوسع الأول", "duration": "3 أشهر", "text": "تعميم آلية التحويل لحالات البالغين (18 سنة فأكثر) من جميع المستشفيات التي يتوفر بها أطباء تأهيل."}, {"n": "٣", "title": "التوسع الشامل", "duration": "3 أشهر", "text": "توسيع نطاق الخدمة ليشمل تحويل حالات البالغين والأطفال، وتوحيد إجراءات التحويل لجميع الفئات العمرية."}, {"n": "٤", "title": "استكمال التغطية", "duration": "4 أشهر", "text": "تغطية جميع مستشفيات التجمع الصحي بخدمة التحويل للعيادة الافتراضية، بما فيها المستشفيات التي لا يتوفر بها أطباء تأهيل مثل مستشفى العويقيلة ومستشفى الشعبة."}]}, {"heading": "ما الذي يحققه المشروع؟", "note": "أثر متوقع على جودة الخدمة والمستفيدين", "type": "outcomes", "items": ["إيصال خدمات علاج النطق والتخاطب لفئات من المرضى لم تكن الخدمة تصلهم سابقًا في جميع محافظات المنطقة", "تقليل مدة انتظار المرضى للحصول على الخدمة", "رفع كفاءة استثمار الكادر المتخصص المتوفر", "دعم استمرارية الرعاية العلاجية للمرضى دون الحاجة للتنقل المتكرر", "تعزيز التحول الرقمي في خدمات التأهيل بما يتوافق مع مستهدفات وزارة الصحة ورؤية المملكة 2030"]}]}, {"id": "rehab-center", "title": "مركز التأهيل الطبي بعرعر", "status": "منجز", "statusLabel": "مشروع منجز", "icon": "🏥", "tagline": "مركز متخصص يقدم خدمات التأهيل الطبي للمستفيدين من عمر 18 عامًا فأكثر، عبر فريق متعدد التخصصات. التقرير السنوي: أغسطس 2025م – يوليو 2026م.", "kpis": [{"value": "4", "label": "أقسام تخصصية"}, {"value": "المركز الأول", "label": "مؤشر تجربة المريض (شهرين متتاليين)"}, {"value": "Fully Met", "label": "اعتماد سباهي — العلاج الطبيعي"}, {"value": "أخضر", "label": "المستوى المحافظ عليه طوال العام"}], "sections": [{"heading": "أقسام المركز", "note": "المركز المرجعي الوحيد بالمنطقة في مجال الأطراف الصناعية والأجهزة التعويضية", "type": "cards", "items": [{"icon": "🩻", "title": "الطب الطبيعي والتأهيل", "text": "تقييم وتشخيص وإدارة حالات التأهيل الطبي"}, {"icon": "🤸", "title": "العلاج الطبيعي", "text": "برامج علاجية لاستعادة الحركة والوظيفة الجسدية"}, {"icon": "✋", "title": "العلاج الوظيفي", "text": "تمكين المرضى من أداء أنشطة الحياة اليومية باستقلالية"}, {"icon": "🦿", "title": "الأطراف الصناعية والأجهزة التعويضية", "text": "يخدم جميع مرضى منطقة الحدود الشمالية بمختلف الأعمار"}]}, {"heading": "أبرز الإنجازات", "type": "outcomes", "items": ["افتتاح وتشغيل مبنى المركز الجديد ونقل جميع أقسام التأهيل الطبي إليه", "نقل ورشة الأطراف الصناعية والأجهزة التعويضية إلى داخل مبنى المركز، بما حسّن كفاءة سير العمل ورحلة المستفيد", "افتتاح عيادة صحة المرأة", "افتتاح عيادة تخطيط الأعصاب (NCS / EMG)", "افتتاح عيادة البوتكس العلاجية", "العمل على استكمال افتتاح عيادة علاج الوذمة اللمفية (Lymphedema Clinic)", "تحقيق المركز الأول في مؤشر تجربة المريض لمدة شهرين متتاليين، مع المحافظة على المستوى الأخضر طوال بقية العام", "اجتياز قسم العلاج الطبيعي لمتطلبات اعتماد سباهي بدرجة (Fully Met)", "تحديث وتصحيح جميع مسميات عيادات التأهيل الطبي في نظام المواعيد بما يتوافق مع الخدمات المقدمة", "استقبال طلاب وطالبات العلاج الوظيفي للتدريب السريري، دعمًا لتطوير الكفاءات الوطنية"]}, {"heading": "التحديات الحالية", "note": "تتطلب الدعم لضمان استدامة جودة الخدمات وتحقيق التوسع المستهدف", "type": "exclusions", "items": ["استمرار نقص الكادر في قسم العلاج الطبيعي، وخاصة العلاج الطبيعي للنساء، بما لا يتناسب مع حجم الإحالات والطلب المتزايد", "ارتفاع قائمة انتظار العلاج الطبيعي (قسم النساء) لتصل إلى نحو ثلاثة أشهر", "الحاجة إلى توفير أجهزة طبية إضافية لدعم الخدمات الحالية والعيادات التخصصية المستحدثة", "الحاجة إلى زيادة عدد أجهزة الحاسب الآلي لدعم الكوادر الصحية والإدارية والتحول الرقمي", "عدم توفر اللوحات الإرشادية الداخلية بالمركز، مما يؤثر على سهولة تنقل المستفيدين والزوار"]}, {"heading": "التوصيات", "type": "outcomes", "items": ["دعم المركز باستحداث وظائف إضافية للعلاج الطبيعي، مع إعطاء أولوية لقسم العلاج الطبيعي (نساء)", "توفير الأجهزة الطبية اللازمة بما يتناسب مع التوسع في الخدمات", "دعم المركز بأجهزة حاسب آلي إضافية", "استكمال تنفيذ اللوحات الإرشادية الداخلية والخارجية للمركز"]}]}, {"id": "waitlist-reduction", "title": "تقليل قائمة مواعيد مرضى قسم العلاج الطبيعي", "status": "منجز", "statusLabel": "مشروع منجز", "icon": "⏱️", "tagline": "خفض مدة انتظار مواعيد العلاج الطبيعي في مركز التأهيل الطبي من ثلاثة أشهر إلى أسبوعين، عبر سبعة إجراءات تشغيلية.", "kpis": [{"value": "3 أشهر ← أسبوعان", "label": "مدة الانتظار"}, {"value": "361 ← 37", "label": "عدد المرضى بالقائمة"}, {"value": "90%", "label": "نسبة الانخفاض في القائمة"}, {"value": "7", "label": "إجراءات تشغيلية مطبّقة"}], "sections": [{"heading": "التحدي", "type": "exclusions", "items": ["وصول قائمة المواعيد في تخصص العلاج الطبيعي لثلاثة أشهر خلال الربع الأول من 2026", "بمعدل 361 مريض جديد بالقائمة"]}, {"heading": "الحلول المطبّقة", "note": "سبعة إجراءات تشغيلية متوازية", "type": "outcomes", "items": ["زيادة نسبة الأشغال لمشرفي الأقسام والأخصائيين", "فرز الحالات الحرجة والمزمنة", "تقليل مواعيد المتابعة للحالات المزمنة", "تكثيف الجلسات التعليمية والتمارين المنزلية", "بدء الجلسات الجماعية للحالات المتشابهة", "مراجعة نسب عدم الحضور وإدارة المواعيد الشاغرة بشكل يومي", "متابعة مؤشرات الأداء بشكل أسبوعي"]}, {"heading": "النتيجة", "note": "مقارنة بين بيانات الربع الأول وبيانات شهر يوليو 2026", "type": "comparison", "items": [{"label": "مدة الانتظار", "beforeLabel": "الربع الأول 2026", "before": "3 أشهر", "beforeVal": 3, "afterLabel": "يوليو 2026", "after": "أسبوعان", "afterVal": 0.5, "unit": "شهر"}, {"label": "عدد المرضى بالقائمة", "beforeLabel": "الربع الأول 2026", "before": "361 مريض", "beforeVal": 361, "afterLabel": "يوليو 2026", "after": "37 مريض", "afterVal": 37, "unit": "مريض"}]}, {"heading": "الأثر", "type": "outcomes", "items": ["وصول قائمة المواعيد إلى أسبوعين خلال شهر يوليو 2026", "دخول مدة الانتظار ضمن النطاق الطبيعي للمواعيد الخارجية (27 يوم عمل)", "خفض عدد المرضى المنتظرين بالقائمة من 361 إلى 37 مريض"]}]}, {"id": "rehab-pathway", "title": "مسار التأهيل الطبي", "status": "قائم", "statusLabel": "مشروع قائم", "icon": "🧭", "tagline": "تحويل مباشر لمرضى اضطرابات وآلام الجهاز العضلي الهيكلي من مراكز الرعاية الصحية الأولية إلى مركز التأهيل الطبي، دون الحاجة للمرور بعيادات العظام أو الأعصاب.", "kpis": [{"value": "7", "label": "مراكز صحية مطبِّقة"}, {"value": "مباشر", "label": "نوع مسار التحويل"}, {"value": "0", "label": "عيادات وسيطة مطلوبة"}], "sections": [{"heading": "كيف يعمل المسار؟", "type": "cards", "items": [{"icon": "📅", "title": "تحويل مباشر بموعد", "text": "تفعيل مسار مباشر للتحويل عن طريق برنامج موعد"}, {"icon": "🔗", "title": "ربط مباشر", "text": "يربط المراكز الصحية مباشرة بقسم التأهيل الطبي في برج الشمال الطبي"}, {"icon": "🦴", "title": "نطاق الخدمة", "text": "يختص بحالات آلام الجهاز العضلي الهيكلي"}]}, {"heading": "المراكز الصحية المطبِّقة للمسار", "note": "طُبق في عدد 7 مراكز صحية في مدينة عرعر", "type": "facilities", "items": ["مركز صحي جنوب الفيصلية", "مركز صحي المنصورية", "مركز صحي العزيزية", "مركز صحي بدنة", "مركز صحي الربوة", "مركز صحي الصالحية الأوسط", "مركز صحي الصالحية الشمالي"]}, {"heading": "أهداف المسار", "type": "outcomes", "items": ["تحسين كفاءة تقديم الخدمة وتسريع حصول المرضى على الرعاية المناسبة", "تقليل خطوات التحويل بإلغاء الحاجة للمرور بعيادات العظام أو الأعصاب", "ضمان سلامة المرضى وجودة الخدمة وفق معايير إحالة محددة"]}]}]};
+const DEPT_VISITS = {"rehab": [{"id": "visit-rafha-mch-apr2026", "facility": "مستشفى الولادة والأطفال برفحاء", "date": "أبريل 2026", "summary": "زيارة تقييمية لقسم التأهيل الطبي شملت الطاقم وآلية العمل والتجهيزات ومرافق المبنى.", "stats": [{"value": "2", "label": "أخصائيون متواجدون"}, {"value": "11", "label": "محاور تم تقييمها"}, {"value": "5", "label": "ملاحظات مرصودة"}, {"value": "5", "label": "توصيات"}], "checklist": [{"group": "آلية العمل في العيادات الخارجية", "items": [{"q": "آلية التحويل للقسم", "a": "إلكتروني", "s": "ok"}, {"q": "مواعيد المرضى", "a": "إلكتروني", "s": "ok"}, {"q": "آلية تسجيل حضور المرضى", "a": "عن طريق برنامج Careware", "s": "ok"}, {"q": "بطاقة مراجعة المريض", "a": "إلكتروني", "s": "ok"}, {"q": "تسجيل المرضى المتغيبين (No show)", "a": "عن طريق برنامج Careware", "s": "ok"}, {"q": "سياسة إقفال ملف المريض المتغيب", "a": "بعد التغيب 4 جلسات متتالية أو عدم الحضور لمدة أسبوعين", "s": "ok"}, {"q": "سياسة إعادة المريض للطبيب عند عدم التحسن", "a": "إذا أتم المريض جلساته العلاجية ولم يتحسن يُحوّل للطبيب", "s": "ok"}]}, {"group": "العيادات الافتراضية", "items": [{"q": "توافر خدمة العيادات الافتراضية", "a": "غير متوفرة", "s": "no"}]}, {"group": "آلية العمل في الأقسام الداخلية", "items": [{"q": "توفر نماذج الإحالة من قبل الأطباء", "a": "متوفرة لكن غير مفعّلة بالشكل المطلوب", "s": "partial"}, {"q": "التوثيق والمتابعة عبر ملفات المرضى إلكترونيًا", "a": "متوفر، بحاجة خطة تحسينية لجودة التوثيق", "s": "partial"}, {"q": "التقييم من قبل طبيب التأهيل", "a": "لا يوجد طبيب تأهيل", "s": "no"}, {"q": "توثيق مخاطر السقوط للمرضى المعنيين", "a": "غير متوفر", "s": "no"}, {"q": "كتابة الخطة العلاجية والتمارين اللازمة", "a": "متوفر", "s": "ok"}]}, {"group": "الأدوات الطبية والسلامة", "items": [{"q": "جهاز الصدمات الكهربائية (AED)", "a": "متوفر", "s": "ok"}, {"q": "Alcohol swap", "a": "متوفر", "s": "ok"}, {"q": "Ultrasound Gel", "a": "متوفر", "s": "ok"}, {"q": "طفايات حريق", "a": "متوفر", "s": "ok"}, {"q": "لوحات إرشادية لمخارج الطوارئ", "a": "متوفر", "s": "ok"}, {"q": "مخارج طوارئ خاصة بالقسم", "a": "متوفر", "s": "ok"}, {"q": "حاوية النفايات الطبية المعدية", "a": "متوفر", "s": "ok"}, {"q": "حاوية النفايات الطبية الحادة", "a": "متوفر", "s": "ok"}, {"q": "أدوات مكافحة العدوى (قفازات، كمامات، تطهير اليدين)", "a": "متوفر", "s": "ok"}, {"q": "مضخات الجل الكحولي مع لوحة التعليمات", "a": "متوفر", "s": "ok"}, {"q": "نظافة أسرة الفحص", "a": "نظيفة", "s": "ok"}, {"q": "عدم وجود تشققات في الأسرة", "a": "لا يوجد تشققات", "s": "ok"}, {"q": "توفر غطاء السرير", "a": "متوفر", "s": "ok"}]}, {"group": "مرافق المبنى", "items": [{"q": "الغرف العلاجية نساء", "a": "2 سرير أطفال", "s": "partial"}, {"q": "صالة تمارين علاجية رجال", "a": "صالة تمارين للأطفال", "s": "partial"}, {"q": "صالة تمارين علاجية نساء", "a": "لا يوجد", "s": "no"}, {"q": "عيادات الطب الطبيعي والتأهيل", "a": "لا يوجد", "s": "no"}, {"q": "أسرّة عيادات الطب الطبيعي والتأهيل", "a": "لا يوجد", "s": "no"}, {"q": "موظفو استقبال مخصصون", "a": "يوجد", "s": "ok"}, {"q": "انتظار رجال / نساء", "a": "يوجد (مشترك)", "s": "partial"}, {"q": "ممرات الوصول الشامل لذوي الإعاقة", "a": "يوجد", "s": "ok"}, {"q": "مكاتب للأخصائيين رجال / نساء", "a": "يوجد", "s": "ok"}, {"q": "غرف مخصصة للعلاج المائي", "a": "لا يوجد", "s": "no"}, {"q": "مستودع", "a": "يوجد", "s": "ok"}]}, {"group": "الزيارات المنزلية", "items": [{"q": "توافر خدمة الزيارات المنزلية", "a": "لا يتوفر", "s": "no"}]}], "findings": ["عدم توفر نماذج تقييم مخاطر السقوط ضمن نظام Careware", "عدم توفر حصائر (Mats) مخصصة للتمارين، حيث تُنفذ التمارين على السرير، مما قد يشكل خطورة لعدم ضمان حركة الطفل بشكل آمن", "ضيق مساحة صالة التمارين وازدحامها بالمعدات، لضيق مساحة غرفة التخزين مما يحد من كفاءة الاستخدام", "وجود أجهزة غير مستغلة لعدم إلمام الموظفين بطريقة تشغيلها، مثل جهاز Amadeo الخاص بالأطراف العلوية", "اشتراك صالة التمارين بين قسمي العلاج الطبيعي والعلاج الوظيفي، مما قد يؤثر على تنظيم العمل وكفاءة تقديم الخدمة، ولحاجة بعض المرضى لبيئة خالية من المشتتات عند العمل على مهاراتهم الذهنية"], "recommendations": ["العمل على تضمين نماذج تقييم مخاطر السقوط ضمن نظام Careware، مع تدريب الكوادر على استخدامها", "إعادة تنظيم صالة التمارين من خلال تقليل الازدحام وإزالة أو تخزين الأجهزة غير المستخدمة", "دراسة إمكانية توسيع المساحة أو نقل القسم لتحسين توزيع المعدات ورفع كفاءة الخدمات المقدمة", "تنفيذ برامج تدريبية للموظفين على استخدام الأجهزة الطبية المتوفرة وغير المستخدمة، مثل جهاز Amadeo", "وضع آلية تنظيمية واضحة لاستخدام صالة التمارين المشتركة بين العلاج الطبيعي والوظيفي، مثل جدولة المواعيد أو تخصيص أوقات محددة لكل قسم"]}]};
 let workforceData = WORKFORCE_ARCHIVE;
 let activeDept = 'labs';
 
@@ -811,6 +858,104 @@ function wireProjectTiles(){
   });
 }
 
+/* ---------- field visit reports ---------- */
+function visitDetail(v){
+  const all = v.checklist.flatMap(g => g.items);
+  const ok = all.filter(i => i.s === 'ok').length;
+  const partial = all.filter(i => i.s === 'partial').length;
+  const no = all.filter(i => i.s === 'no').length;
+  const pct = Math.round((ok / all.length) * 100);
+
+  const groups = v.checklist.map(g => `
+    <div class="vs-group">
+      <div class="vs-group-name">${escapeHtml(g.group)}</div>
+      ${g.items.map(i => `
+        <div class="vs-item vs-${i.s}">
+          <span class="vs-dot"></span>
+          <span class="vs-q">${escapeHtml(i.q)}</span>
+          <span class="vs-a">${escapeHtml(i.a)}</span>
+        </div>`).join('')}
+    </div>`).join('');
+
+  return `
+    <div class="vs-detail" id="vsd-${escapeHtml(v.id)}" style="display:none;">
+      <div class="pj-kpis">
+        ${v.stats.map(k => `<div class="pj-kpi"><div class="pj-kpi-v">${escapeHtml(k.value)}</div><div class="pj-kpi-l">${escapeHtml(k.label)}</div></div>`).join('')}
+      </div>
+
+      <div class="pj-sec">
+        <div class="pj-sec-head"><h4>ملخص المطابقة</h4><p>${ok} مطابق · ${partial} يحتاج تحسين · ${no} غير متوفر — من أصل ${all.length} بند</p></div>
+        <div class="vs-meter">
+          <div class="vs-meter-fill vs-ok"      style="width:${(ok/all.length)*100}%"></div>
+          <div class="vs-meter-fill vs-partial" style="width:${(partial/all.length)*100}%"></div>
+          <div class="vs-meter-fill vs-no"      style="width:${(no/all.length)*100}%"></div>
+        </div>
+        <div class="vs-legend">
+          <span><span class="vs-key vs-ok"></span> مطابق (${pct}%)</span>
+          <span><span class="vs-key vs-partial"></span> يحتاج تحسين</span>
+          <span><span class="vs-key vs-no"></span> غير متوفر</span>
+        </div>
+      </div>
+
+      <div class="pj-sec">
+        <div class="pj-sec-head"><h4>بنود التقييم</h4></div>
+        ${groups}
+      </div>
+
+      <div class="pj-sec">
+        <div class="pj-sec-head"><h4>الملاحظات المرصودة</h4></div>
+        <div class="pj-excl">${v.findings.map(f => `<div class="pj-excl-row"><span class="pj-x">!</span><span>${escapeHtml(f)}</span></div>`).join('')}</div>
+      </div>
+
+      <div class="pj-sec">
+        <div class="pj-sec-head"><h4>التوصيات</h4></div>
+        <div class="pj-out">${v.recommendations.map((r,n) => `<div class="pj-out-row"><span class="pj-n">${n+1}</span><span>${escapeHtml(r)}</span></div>`).join('')}</div>
+      </div>
+    </div>`;
+}
+
+function renderVisitsCard(deptId){
+  const list = DEPT_VISITS[deptId];
+  if(!list || list.length === 0) return '';
+  return `
+    <div class="card">
+      <h3>${iconBadge("📝","badge-teal")} الجولات الميدانية</h3>
+      <div class="vs-grid">
+        ${list.map(v => {
+          const all = v.checklist.flatMap(g => g.items);
+          const pct = Math.round((all.filter(i => i.s === 'ok').length / all.length) * 100);
+          return `
+            <div class="vs-tile" data-vs="${escapeHtml(v.id)}">
+              <div class="vs-tile-top">
+                <span class="vs-pct">${pct}%</span>
+                <span class="vs-date">${escapeHtml(v.date)}</span>
+              </div>
+              <div class="vs-fac">${escapeHtml(v.facility)}</div>
+              <div class="vs-sum">${escapeHtml(v.summary)}</div>
+              <div class="pj-more">عرض التقرير</div>
+            </div>`;
+        }).join('')}
+      </div>
+      ${list.map(visitDetail).join('')}
+    </div>`;
+}
+
+function wireVisitTiles(){
+  document.querySelectorAll('.vs-tile').forEach(tile => {
+    tile.addEventListener('click', () => {
+      const panel = document.getElementById('vsd-' + tile.dataset.vs);
+      const opening = panel.style.display === 'none';
+      document.querySelectorAll('.vs-detail').forEach(p => p.style.display = 'none');
+      document.querySelectorAll('.vs-tile').forEach(t => t.classList.remove('pj-open'));
+      if(opening){
+        panel.style.display = 'block';
+        tile.classList.add('pj-open');
+        panel.scrollIntoView({behavior:'smooth', block:'nearest'});
+      }
+    });
+  });
+}
+
 function detailedWorkforceCard(deptId){
   const d = WORKFORCE_DETAILED[deptId];
   if(!d) return '';
@@ -905,6 +1050,7 @@ async function renderDeptContent(){
     </div>
     ${renderOrgChart(dept.id, dept.name)}
     ${renderProjectsCard(dept.id)}
+    ${renderVisitsCard(dept.id)}
     ${workforceCardForDept(dept)}
     ${renderServicesCard(dept.id)}
     ${renderAchievementsCard(dept.id)}
@@ -916,6 +1062,7 @@ async function renderDeptContent(){
   wireLabEquipmentFilters();
   wireRadiologyEquipmentFilters();
   wireProjectTiles();
+  wireVisitTiles();
   el.querySelectorAll('.highlight-clickable').forEach(card => {
     card.addEventListener('click', () => window.open(card.dataset.href, '_blank'));
   });
