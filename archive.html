@@ -248,6 +248,7 @@ const RADIOLOGY_DEVICES = [{"facility": "برج الشمال الطبي", "name"
 
 /* All content is baked into this page at build time — no remote database. */
 const WORKFORCE_ARCHIVE = {"hospitals": ["برج الشمال الطبي", "الأمير عبدالعزيز بن مساعد", "مركز القلب بعرعر", "النساء والولادة بعرعر", "مجمع إرادة والصحة النفسية", "جديدة عرعر", "الرعاية المديدة", "الولادة والأطفال برفحاء", "رفحاء العام", "الشعبة العام", "العويقيلة العام", "طريف العام"], "rows": [{"specialty": "المختبر", "current": [27.0, 21.0, 13.0, 26.0, 7.0, 6.0, 3.0, 6.0, 12.0, 6.0, 7.0, 31.0], "needed": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 9.0, 9.0, 2.0, 3.0, 0.0]}, {"specialty": "الأشعة", "current": [9.0, 8.0, 2.0, 10.0, 2.0, 1.0, 4.0, 11.0, 23.0, 6.0, 5.0, 12.0], "needed": [12.0, 13.0, 5.0, 11.0, 4.0, 3.0, 0.0, 7.0, 0.0, 4.0, 5.0, 7.0]}, {"specialty": "الصيدلة", "current": [27.0, 19.0, 6.0, 18.0, 9.0, 8.0, 5.0, 12.0, 18.0, 4.0, 12.0, 19.0], "needed": [3.0, 6.0, 3.0, 7.0, 3.0, 1.0, 0.0, 8.0, 2.0, 6.0, 0.0, 5.0]}, {"specialty": "العلاج الطبيعي", "current": [16.0, 0.0, 0.0, 4.0, 0.0, 0.0, 4.0, 4.0, 10.0, 2.0, 2.0, 8.0], "needed": [10.0, 2.0, 2.0, 0.0, 2.0, 1.0, 1.0, 0.0, 0.0, 0.0, 2.0, 0.0]}, {"specialty": "العلاج الوظيفي", "current": [3.0, 0.0, 0.0, 3.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 2.0], "needed": [2.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0]}, {"specialty": "الأطراف الصناعية", "current": [2.0, null, null, null, null, null, null, null, null, null, null, null], "needed": [4.0, null, null, null, null, null, null, null, null, null, null, null]}, {"specialty": "النطق والتخاطب", "current": [0.0, 0.0, 0.0, 0.0, 0.0, null, null, 0.0, 0.0, null, null, 1.0], "needed": [2.0, 1.0, 1.0, 2.0, 1.0, null, null, 1.0, 1.0, null, null, 0.0]}, {"specialty": "التغذية العامة", "current": [1.0, 1.0, 0.0, 2.0, 2.0, 0.0, 0.0, 1.0, 3.0, 1.0, 0.0, 0.0], "needed": [null, 3.0, null, null, null, null, null, null, null, null, null, null]}, {"specialty": "التغذية العلاجية", "current": [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "needed": [null, 6.0, 0.0, null, null, null, null, null, null, null, null, null]}, {"specialty": "الأخصائي النفسي", "current": [2.0, 0.0, 0.0, 0.0, 6.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0], "needed": [3.0, 2.0, 0.0, 3.0, 6.0, 2.0, 0.0, 2.0, 3.0, 2.0, 2.0, 0.0]}, {"specialty": "الأخصائي الاجتماعي", "current": [2.0, 1.0, 3.0, 3.0, 11.0, 0.0, 2.0, 0.0, 5.0, 0.0, 0.0, 1.0], "needed": [8.0, 5.0, 1.0, 8.0, 6.0, 2.0, 2.0, 2.0, 2.0, 2.0, 3.0, 8.0]}]};
+const WORKFORCE_DETAILED = {"labs": {"columns": ["فني", "اخصائي", "اخصائي أول", "متسربين خارج المختبر", "موفدين ومبتعثين", "المجموع الكلي"], "rows": [{"facility": "الأمير عبدالعزيز بن مساعد", "values": [3, 13, 2, 2, 2, 22]}, {"facility": "برج الشمال الطبي", "values": [10, 13, 1, 1, 2, 27]}, {"facility": "النساء والولادة والأطفال بعرعر", "values": [6, 15, 1, 3, 1, 26]}, {"facility": "مجمع إرادة للصحة النفسية", "values": [5, 2, null, null, null, 7]}, {"facility": "جديدة عرعر", "values": [3, 2, null, null, 1, 6]}, {"facility": "مركز الأمير عبدالله لطب وجراحة القلب", "values": [5, 6, null, 1, null, 13]}, {"facility": "الرعاية المديدة", "values": [2, 1, null, null, null, 3]}, {"facility": "طريف العام", "values": [17, 6, 2, 5, 1, 31]}, {"facility": "العويقيلة", "values": [6, 1, null, null, null, 7]}, {"facility": "شعبة نصاب", "values": [3, 3, null, null, null, 6]}, {"facility": "رفحاء العام", "values": [7, 3, null, 1, 1, 12]}, {"facility": "النساء والولادة والأطفال برفحاء", "values": [2, 4, null, null, null, 6]}, {"facility": "المختبر الإقليمي", "values": [1, 25, 4, 1, 4, 35]}, {"facility": "بنك الدم المساند", "values": [6, 6, 1, 1, null, 14]}], "totalCol": 5}, "pharmacy": {"columns": ["قسم الصيدلية", "مراقبة المخزون والتموين الطبي", "متسربين (داخل الجهة)", "الدعم", "المجموع"], "rows": [{"facility": "برج الشمال الطبي", "values": [25, 6, 14, null, 45]}, {"facility": "الأمير عبدالعزيز بن مساعد", "values": [18, 5, 9, null, 32]}, {"facility": "النساء والولادة والأطفال بعرعر", "values": [18, 6, 5, 1, 30]}, {"facility": "جديدة عرعر", "values": [7, 0, 2, null, 9]}, {"facility": "مجمع إرادة والصحة النفسية", "values": [6, 3, 3, null, 12]}, {"facility": "الرعاية المديدة", "values": [5, 4, 2, 1, 12]}, {"facility": "مركز الأمير عبدالله لطب وجراحة القلب", "values": [6, 2, 1, 1, 10]}, {"facility": "رفحاء المركزي", "values": [18, 5, 4, null, 27]}, {"facility": "النساء والولادة والأطفال برفحاء", "values": [11, 3, 1, null, 15]}, {"facility": "طريف العام", "values": [19, 8, 15, null, 42]}, {"facility": "العويقيلة العام", "values": [11, 2, 5, null, 18]}, {"facility": "شعبة نصاب العام", "values": [4, 2, 1, null, 7]}], "totalCol": 4}, "mental": {"columns": ["طبيب نفسي", "اخصائي نفسي", "اخصائي اجتماعي", "متسربين"], "rows": [{"facility": "برج الشمال الطبي", "values": [0, 2, 2, null]}, {"facility": "الأمير عبدالعزيز بن مساعد", "values": [0, 0, 2, 1]}, {"facility": "النساء والولادة بعرعر", "values": [0, 0, 3, null]}, {"facility": "الرعاية المديدة", "values": [0, 1, 2, null]}, {"facility": "مركز الأمير عبدالله لجراحة القلب", "values": [0, 0, 3, null]}, {"facility": "مجمع إرادة للصحة النفسية", "values": [12, 6, 12, null]}, {"facility": "رفحاء العام", "values": [2, 1, 4, null]}, {"facility": "النساء والأطفال برفحاء", "values": [0, 0, 0, null]}, {"facility": "طريف العام", "values": [1, 0, 1, null]}, {"facility": "العويقيلة العام", "values": [0, 1, 0, null]}, {"facility": "الشعبة العام", "values": [0, 0, 0, null]}, {"facility": "جديدة عرعر العام", "values": [0, 0, 0, null]}], "sumCols": [0, 1, 2]}, "nutrition": {"columns": ["تغذية عامة", "تغذية علاجية"], "rows": [{"facility": "النساء والولادة بعرعر", "values": [2, 0]}, {"facility": "برج الشمال الطبي", "values": [1, 1]}, {"facility": "الأمير عبدالعزيز بن مساعد", "values": [2, 0]}, {"facility": "الرعاية المديدة", "values": [0, 0]}, {"facility": "مركز الأمير عبدالله لطب وجراحة القلب", "values": [0, 0]}, {"facility": "مجمع إرادة والصحة النفسية", "values": [2, 0]}, {"facility": "رفحاء العام", "values": [3, 0]}, {"facility": "النساء والولادة والأطفال برفحاء", "values": [1, 0]}, {"facility": "الشعبة العام", "values": [1, 0]}, {"facility": "طريف العام", "values": [0, 0]}, {"facility": "جديدة عرعر العام", "values": [0, 0]}, {"facility": "العويقيلة العام", "values": [1, 0]}], "sumCols": [0, 1]}, "rehab": {"columns": ["طب طبيعي — استشاري", "طب طبيعي — طبيب نائب", "طب طبيعي — اخصائي", "طب طبيعي — اخصائي أول", "علاج طبيعي — اخصائي أول", "علاج طبيعي — اخصائي", "علاج طبيعي — فني", "علاج وظيفي — اخصائي أول", "علاج وظيفي — اخصائي", "نطق وتخاطب — اخصائي أول", "نطق وتخاطب — اخصائي", "أطراف صناعية — اخصائي أول", "أطراف صناعية — اخصائي", "أطراف صناعية — فني", "متسربين", "موفدين ومبتعثين"], "rows": [{"facility": "برج الشمال الطبي", "values": [2, 0, 0, 2, 1, 12, 0, 0, 2, 0, 0, 0, 2, 0, null, 3]}, {"facility": "النساء والولادة والأطفال بعرعر", "values": [0, 0, 1, 0, 0, 4, 0, 0, 3, 0, 0, 0, 0, 0, null, null]}, {"facility": "طريف العام", "values": [0, 0, 0, 0, 1, 7, 0, 0, 2, 0, 1, 0, 0, 0, 1, null]}, {"facility": "رفحاء العام", "values": [0, 1, 0, 0, 0, 4, 2, 0, 1, 0, 0, 0, 0, 0, 1, 3]}, {"facility": "الشعبة العام", "values": [0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, null, null]}, {"facility": "الرعاية المديدة", "values": [0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 1, null]}, {"facility": "العويقيلة العام", "values": [0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, null, null]}, {"facility": "النساء والولادة والأطفال برفحاء", "values": [0, 0, 0, 0, 0, 3, 0, 0, 1, 0, 0, 0, 0, 0, null, 1]}], "sumCols": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]}, "radiology": null};
 let workforceData = WORKFORCE_ARCHIVE;
 let activeDept = 'labs';
 
@@ -586,15 +587,41 @@ function specialtyChart(specialtyName){
   return renderBarChart(specialtyName, items);
 }
 
+function detailedWorkforceCard(deptId){
+  const d = WORKFORCE_DETAILED[deptId];
+  if(!d) return '';
+  const head = ['المنشأة', ...d.columns].map(h => `<th>${escapeHtml(h)}</th>`).join('');
+  const body = d.rows.map(r => `
+    <tr>
+      <td>${escapeHtml(r.facility)}</td>
+      ${r.values.map(v => `<td>${v === null || v === undefined ? '—' : v}</td>`).join('')}
+    </tr>
+  `).join('');
+  // column totals, skipping cells the source left blank
+  const totals = d.columns.map((_, i) =>
+    d.rows.reduce((a, r) => a + (typeof r.values[i] === 'number' ? r.values[i] : 0), 0)
+  );
+  const totalRow = `<tr class="totals-row"><td>الإجمالي</td>${totals.map(t => `<td>${t}</td>`).join('')}</tr>`;
+  return `
+    <div class="card">
+      <h3>${iconBadge("📋","badge-blue")} تفصيل القوى العاملة حسب الفئة الوظيفية</h3>
+      <div class="table-scroll">
+        <table><thead><tr>${head}</tr></thead><tbody>${body}${totalRow}</tbody></table>
+      </div>
+    </div>
+  `;
+}
+
 function workforceCardForDept(dept){
+  const detail = detailedWorkforceCard(dept.id);
   const split = SPLIT_BY_SPECIALTY[dept.id];
   if(split){
-    return split.map(specialtyChart).join('');
+    return detail + split.map(specialtyChart).join('');
   }
   const items = WORKFORCE_FINAL[dept.id];
-  if(!items) return '';
+  if(!items) return detail;
   const mapped = items.map(it => ({label: it.facility, value: it.value}));
-  return renderBarChart('القوى العاملة — ' + dept.name, mapped);
+  return detail + renderBarChart('القوى العاملة — ' + dept.name, mapped);
 }
 
 async function renderDeptContent(){
