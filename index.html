@@ -377,6 +377,15 @@
       <div id="workforceCards" class="wf-cards"></div>
     </div>
 
+    <div id="section-jobdist" class="section-panel" style="display:none;">
+      <div class="panel-head">
+        <h2>توزيع الوظائف</h2>
+        <p class="muted">عدد الوظائف المساندة الموزّعة على منشآت التجمع لكل تخصص</p>
+      </div>
+      <div class="stats-row" id="jobdistStatsRow"></div>
+      <div id="jobdistCards" class="wf-cards"></div>
+    </div>
+
     <div id="section-projects" class="section-panel" style="display:none;">
       <div class="panel-head">
         <h2>لوحة متابعة المشاريع</h2>
@@ -407,10 +416,12 @@ const SEED_DATA = [{"id": "pharmacy", "name": "قسم الرعاية الصيد�
 const WORKFORCE_DATA = {"hospitals": ["برج الشمال الطبي", "الأمير عبدالعزيز بن مساعد", "مركز القلب بعرعر", "النساء والولادة بعرعر", "مجمع إرادة والصحة النفسية", "جديدة عرعر", "الرعاية المديدة", "الولادة والأطفال برفحاء", "رفحاء العام", "الشعبة العام", "العويقيلة العام", "طريف العام"], "rows": [{"specialty": "المختبر", "current": [27.0, 21.0, 13.0, 26.0, 7.0, 6.0, 3.0, 6.0, 12.0, 6.0, 7.0, 31.0], "needed": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 9.0, 9.0, 2.0, 3.0, 0.0]}, {"specialty": "الأشعة", "current": [9.0, 8.0, 2.0, 10.0, 2.0, 1.0, 4.0, 11.0, 23.0, 6.0, 5.0, 12.0], "needed": [12.0, 13.0, 5.0, 11.0, 4.0, 3.0, 0.0, 7.0, 0.0, 4.0, 5.0, 7.0]}, {"specialty": "الصيدلة", "current": [27.0, 19.0, 6.0, 18.0, 9.0, 8.0, 5.0, 12.0, 18.0, 4.0, 12.0, 19.0], "needed": [3.0, 6.0, 3.0, 7.0, 3.0, 1.0, 0.0, 8.0, 2.0, 6.0, 0.0, 5.0]}, {"specialty": "العلاج الطبيعي", "current": [16.0, 0.0, 0.0, 4.0, 0.0, 0.0, 4.0, 4.0, 10.0, 2.0, 2.0, 8.0], "needed": [10.0, 2.0, 2.0, 0.0, 2.0, 1.0, 1.0, 0.0, 0.0, 0.0, 2.0, 0.0]}, {"specialty": "العلاج الوظيفي", "current": [3.0, 0.0, 0.0, 3.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 2.0], "needed": [2.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0]}, {"specialty": "الأطراف الصناعية", "current": [2.0, null, null, null, null, null, null, null, null, null, null, null], "needed": [4.0, null, null, null, null, null, null, null, null, null, null, null]}, {"specialty": "النطق والتخاطب", "current": [0.0, 0.0, 0.0, 0.0, 0.0, null, null, 0.0, 0.0, null, null, 1.0], "needed": [2.0, 1.0, 1.0, 2.0, 1.0, null, null, 1.0, 1.0, null, null, 0.0]}, {"specialty": "التغذية العامة", "current": [1.0, 1.0, 0.0, 2.0, 2.0, 0.0, 0.0, 1.0, 3.0, 1.0, 0.0, 0.0], "needed": [null, 3.0, null, null, null, null, null, null, null, null, null, null]}, {"specialty": "التغذية العلاجية", "current": [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], "needed": [null, 6.0, 0.0, null, null, null, null, null, null, null, null, null]}, {"specialty": "الأخصائي النفسي", "current": [2.0, 0.0, 0.0, 0.0, 6.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0], "needed": [3.0, 2.0, 0.0, 3.0, 6.0, 2.0, 0.0, 2.0, 3.0, 2.0, 2.0, 0.0]}, {"specialty": "الأخصائي الاجتماعي", "current": [2.0, 1.0, 3.0, 3.0, 11.0, 0.0, 2.0, 0.0, 5.0, 0.0, 0.0, 1.0], "needed": [8.0, 5.0, 1.0, 8.0, 6.0, 2.0, 2.0, 2.0, 2.0, 2.0, 3.0, 8.0]}]};
 const PROJECTS_DATA = [{"dept": "قسم المختبرات", "name": "تطوير خدمات نقل الدم في مستشفى العويقيلة و الشعبة", "desc": "يهدف المشروع إلى تطوير خدمات نقل الدم في مستشفيي العويقيلة والشعبة من خلال توفير الأجهزة اللازمة لإجراء اختبارات التوافق بدلًا من الطريقة اليدوية التقليدية. ويسهم المشروع في توحيد إجراءات العمل، ورفع دقة وموثوقية النتائج، وتقليل احتمالية الأخطاء البشرية، وتحسين زمن إنجاز الفحوصات، بما يعزز سلامة المرضى وجودة خدمات نقل الدم في المستشفيين.", "resp": "عبير الشعلان", "start": "24/05/2026", "end": "30/08/2026", "pct": 100, "status": "مكتمل", "blocker": "", "id": "proj-1"}, {"dept": "قسم المختبرات", "name": "فعالية ortho day", "desc": "", "resp": "", "start": "", "end": "", "pct": null, "status": "قيد التنفيذ", "blocker": "", "id": "proj-2"}, {"dept": "قسم الرعاية الصيدلانية", "name": "", "desc": "", "resp": "", "start": "", "end": "", "pct": null, "status": "لم يبدأ", "blocker": "", "id": "proj-3"}, {"dept": "قسم الصحة النفسية والخدمة الاجتماعية", "name": "تفعيل مسار الصحة النفسية ( مراكز- مستشفى الامير عبدالعزيز بن مساعد)", "desc": "يهدف الى تحسين الخدمات المقدمة وازالة الوصمة الاجتماعية", "resp": "محمد قنيفذ العنزي", "start": "12/08/2026", "end": "12/11/2026", "pct": null, "status": "قيد التنفيذ", "blocker": "", "id": "proj-4"}, {"dept": "قسم التغذية", "name": "تصميم لوحة مؤشرات أداء قسم التغذية", "desc": "المبادرة تهدف إلى متابعة أحوال الجهات التابعة ونسبة تطورها خلال الربع الأول والثاني والثالث والرابع من السنة الميلادية", "resp": "خيريه المليحان", "start": "1/2/2026", "end": "9/7/2026", "pct": 100, "status": "مكتمل", "blocker": "تحية طيبة لارسال ناتج المشروع المكتمل عن طريق نظام المراسلات (بين) اوالايميل .. بوركت الجهود", "id": "proj-5"}, {"dept": "قسم التغذية", "name": "تصميم ونشر مجلة توعوية", "desc": "تصميم مجلة تحتوي على معلومات لقسم التغذية بهدف نشر الوعي وتثقيف المجتمع", "resp": "خيريه المليحان", "start": "9/7/2026", "end": "31/7/2026", "pct": null, "status": "مكتمل", "blocker": "", "id": "proj-6"}, {"dept": "قسم التغذية", "name": "خطة تحسين الوجبات المقدمة للمرضى", "desc": "العمل على تحسين شكل ونوع الوجبة المقدمة لجميع المرضى في المستشفيات التابعة", "resp": "خيريه المليحان", "start": "20/7/2026", "end": "30/9/2026", "pct": null, "status": "لم يبدأ", "blocker": "", "id": "proj-7"}, {"dept": "قسم التغذية", "name": "تفعيل ومشاركة الأسبوع العالمي للرضاعة الطبيعية", "desc": "تفعيل أركان أو ركن توعوي لتثقيف المجتمع تغذوياً ومدى تأثير الجانب التغذوي صحياً على جودة الرضاعة الطبيعية", "resp": "خيريه المليحان", "start": "1/8/2026", "end": "7/8/2026", "pct": null, "status": "لم يبدأ", "blocker": "", "id": "proj-8"}, {"dept": "قسم التغذية", "name": "تفعيل ومشاركة شهر التوعية بسرطان الثدي", "desc": "تفعيل أركان أو ركن توعوي لتثقيف المجتمع تغذوياً ومدى تأثير الجانب التغذوي صحياً للحماية من سرطان الثدي", "resp": "خيريه المليحان", "start": "1/10/2026", "end": "31/10/2026", "pct": null, "status": "لم يبدأ", "blocker": "", "id": "proj-9"}, {"dept": "قسم التغذية", "name": "تصميم داشبورد لمتابعة المستخلصات الشهرية", "desc": "لوحة في برنامج الإكسل لتوضيح حالة الرفع للمستخلصات الشهرية حسب الأشهر والسنة", "resp": "خيريه المليحان", "start": "1/6/2026", "end": "9/7/2026", "pct": 100, "status": "مكتمل", "blocker": "تحية طيبة لارسال ناتج المشروع المكتمل عن طريق نظام المراسلات (بين) اوالايميل .. بوركت الجهود", "id": "proj-10"}, {"dept": "قسم الأشعة", "name": "مبادرة ال100 يوم تقليل قوائم الانتظار الرنين المغناطيسي بمدينة عرعر", "desc": "المبادرة تهدف لتقليل قوائم الانتظار في مستشفى برج الشمال الطبي لفحوصات الرنين المغناطيسي وعمل خطة لتوحيد الفحوصات بجميع مستشفيات عرعر لتقليل القوائم وتحسين تجربة المرضى في الاشعة", "resp": "خلود المطيري، عبدالاله العنزي", "start": "19-4-2026", "end": "19-7-2026", "pct": 70, "status": "قيد التنفيذ", "blocker": "تم العمل على القسم الاول من المبادرة وهي تقليل حالات الانتظار في برج الشمال الطبي البالغ عددها 634 حاله وتم افراغ القائمة خلال شهر بعد تكوين فريق من جميع المستشفيات بمدينة عرعر وسيتم بدء المرحلة الثانية للعمل على استدامة النتائج", "id": "proj-11"}, {"dept": "قسم التأهيل الطبي والرعاية المديدة", "name": "تحسين خدمات التأهيل الطبي والرعاية المديدة", "desc": "", "resp": "حسام مليباري، منار الرويلي", "start": "", "end": "", "pct": 30, "status": "قيد التنفيذ", "blocker": "", "id": "proj-12"}, {"dept": "قسم التأهيل الطبي والرعاية المديدة", "name": "مبادرة ١٠٠ يوم لمنع الاصابات المكتبية وتعديل بيئة العمل", "desc": "تهدف المبادرة لرفع الوعي بين الموظفين حول اهمية عمل تمارين الاطالة وتعديل قياسات الاثاث المكتبي لمنع الاصابات العضلية الهيكلية الناتجة عن الاستخدام المطول للاجهزة بوضعيات خاطئة مما يساهم برفع جودة اداء الموظفين", "resp": "حسام مليباري، منار الرويلي", "start": "", "end": "", "pct": 70, "status": "قيد التنفيذ", "blocker": "حصر الاصابات الشائعة الحدوث وتحديد التمارين اللازمه لها، عمل استبيان يقيس مستوى وعي الموظفين بالاصابات واهمية تعديل البيئة المكتبية وعمل التمارين بشكل دوري، البدء بتقييم ميداني عشوائي لقياس مدى ملائمة البيئة المكتبية للمقاييس العالمية", "id": "proj-13"}];
 const STAFF_DATA = [{"name": "هاني زبن العنزي", "title": "أخصائي أول تشريح نسيجي (علم الأمراض)", "dept": "مدير إدارة الخدمات الصحية المساندة", "empNo": "131537", "phone": "0539899898", "email": "hzalanazi@moh.gov.sa", "startDate": "", "id": "staff-1"}, {"name": "خلود سلطان المطيري", "title": "اخصائي مختبر", "dept": "إدارة الخدمات الصحية المساندة", "empNo": "4618092", "phone": "0531617220", "email": "khsualmutairi@moh.sa.gov", "startDate": "", "id": "staff-2"}, {"name": "عبدالإله عايد العنزي", "title": "صيدلي أول", "dept": "إدارة الخدمات الصحية المساندة", "empNo": "", "phone": "0503317639", "email": "", "startDate": "", "id": "staff-3"}, {"name": "عبير محمد الشعلان", "title": "اخصائي أول مختبر", "dept": "رئيس قسم المختبرات", "empNo": "51573378", "phone": "0537574541", "email": "AAlshalan1@moh.gov.sa", "startDate": "20-7-2025", "id": "staff-4"}, {"name": "عبدالله عرعر الرويلي", "title": "اخصائي مختبر", "dept": "قسم المختبرات", "empNo": "", "phone": "0557529429", "email": "aaalrowely@moh.gov.sa", "startDate": "", "id": "staff-5"}, {"name": "د. فايز سريان العنزي", "title": "استشاري اجتماعي غير طبيب", "dept": "رئيس قسم الصحة النفسية والخدمة الاجتماعية", "empNo": "56627", "phone": "0542152875", "email": "fasualenzi@moh.gov.sa", "startDate": "", "id": "staff-6"}, {"name": "جزام الخلفي العنزي", "title": "اخصائي أشعة", "dept": "رئيس قسم الأشعة", "empNo": "", "phone": "0500648013", "email": "Jalenezi@moh.gov.s", "startDate": "", "id": "staff-7"}, {"name": "منى محمد العنزي", "title": "اخصائي تمريض", "dept": "قسم الأشعة", "empNo": "133568", "phone": "0557184448", "email": "malenze@moh.gov.sa", "startDate": "", "id": "staff-8"}, {"name": "حسام علي مليباري", "title": "اخصائي أول علاج طبيعي", "dept": "رئيس قسم التأهيل والرعاية المديدة", "empNo": "4621545", "phone": "0561275734", "email": "hmilibari@moh.gov.sa", "startDate": "", "id": "staff-9"}, {"name": "منار كامل الرويلي", "title": "اخصائي علاج وظيفي", "dept": "قسم التأهيل والرعاية المديدة", "empNo": "108189", "phone": "0559845914", "email": "Manarka@moh.gov.sa", "startDate": "", "id": "staff-10"}, {"name": "حنان كامل الرويلي", "title": "صيدلي", "dept": "رئيس قسم الرعاية الصيدلانية", "empNo": "4709988", "phone": "0507166208", "email": "hananka@moh.gov.sa", "startDate": "20-7-2025", "id": "staff-11"}, {"name": "خيرية أحمد المليحان", "title": "اخصائي تغذية علاجية", "dept": "رئيس قسم التغذية", "empNo": "51568565", "phone": "0539022141", "email": "Kalmelaihan@moh.gov.sa", "startDate": "20-7-2025", "id": "staff-12"}, {"name": "محمد قنيفذ خلف العنزي", "title": "أخصائي أول اجتماعي", "dept": "قسم الصحة النفسية والخدمة الاجتماعية", "empNo": "78781", "phone": "0502312099", "email": "Moqalanazi@moh.gov.sa", "startDate": "6-8-2026", "id": "staff-13"}];
+const JOB_DISTRIBUTION = {"hospitals": ["مستشفى برج الشمال الطبي", "مستشفى الأمير عبدالعزيز بن مساعد", "مستشفى طريف العام", "مستشفى رفحاء العام", "مستشفى النساء والولادة بعرعر", "مستشفى النساء والأطفال برفحاء", "مستشفى العويقيلة العام", "مستشفى الشعبة العام", "مستشفى جديدة عرعر العام", "مستشفى الرعاية المديدة"], "categories": [{"id": "labs", "label": "مختبرات", "icon": "🔬", "total": 15, "values": [0, 0, 0, 5, 0, 5, 3, 2, 0, 0]}, {"id": "radiology", "label": "أشعة", "icon": "🩻", "total": 15, "values": [5, 5, "1 (أخصائية أشعة نساء)", 0, 0, 0, "2 (أخصائية أشعة نساء)", "1 (أخصائية أشعة نساء)", 1, 0]}, {"id": "nutrition_general", "label": "تغذية عامة", "icon": "🍽️", "total": 5, "values": [1, 0, 1, 0, 0, 0, 1, 1, 1, 0]}, {"id": "nutrition_therapeutic", "label": "تغذية علاجية", "icon": "🥗", "total": 10, "values": [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]}, {"id": "respiratory", "label": "علاج تنفسي", "icon": "🫁", "total": 15, "values": [2, 1, 2, 2, 2, 1, 1, 2, 1, 1]}]};
 
 const SECTIONS = [
   {id:'tasks', label:'متابعة المهام', icon:'✅'},
   {id:'workforce', label:'القوى العاملة', icon:'👥'},
+  {id:'jobdist', label:'توزيع الوظائف', icon:'🗂️'},
   {id:'projects', label:'لوحة المشاريع', icon:'📊'},
   {id:'staff', label:'بيانات الموظفين', icon:'🪪'},
 ];
@@ -435,6 +446,7 @@ function switchSection(id){
   });
   renderSectionNav();
   if(id === 'workforce') renderWorkforce();
+  if(id === 'jobdist') renderJobDistribution();
   if(id === 'projects') renderProjects();
   if(id === 'staff') renderStaff();
 }
@@ -527,6 +539,64 @@ async function renderWorkforce(){
           <div class="wf-chips">
             <span class="wf-chip wf-chip-cur">الحالي ${cur}</span>
             ${need > 0 ? `<span class="wf-chip wf-chip-need">الاحتياج +${need}</span>` : '<span class="wf-chip wf-chip-ok">مكتمل</span>'}
+          </div>
+        </div>
+        ${bars}
+      </div>`;
+  }).join('') || '<div class="empty-state">لا توجد بيانات</div>';
+}
+
+/* ---------- Job distribution (read-only, from official headcount table) ---------- */
+function jobDistNumeric(v){
+  if(typeof v === 'number') return v;
+  const m = String(v).match(/\d+/);
+  return m ? parseInt(m[0], 10) : 0;
+}
+
+function renderJobDistribution(){
+  const totalAll = JOB_DISTRIBUTION.categories.reduce((a,c) => a + c.total, 0);
+
+  const statsEl = document.getElementById('jobdistStatsRow');
+  if(statsEl){
+    statsEl.innerHTML = JOB_DISTRIBUTION.categories.map(c => `
+      <div class="stat-card total"><div class="num">${c.total}</div><div class="lbl">${c.icon} ${escapeHtml(c.label)}</div></div>
+    `).join('') + `
+      <div class="stat-card progress"><div class="num">${totalAll}</div><div class="lbl">🗂️ إجمالي الوظائف المساندة</div></div>
+      <div class="stat-card notstarted"><div class="num" style="font-size:15px;">${JOB_DISTRIBUTION.hospitals.length}</div><div class="lbl">عدد المنشآت</div></div>
+    `;
+  }
+
+  const wrap = document.getElementById('jobdistCards');
+  wrap.innerHTML = JOB_DISTRIBUTION.categories.map(cat => {
+    const items = JOB_DISTRIBUTION.hospitals.map((h,i) => ({
+      name: h,
+      raw: cat.values[i],
+      num: jobDistNumeric(cat.values[i]),
+    })).filter(x => x.num > 0);
+
+    if(items.length === 0) return '';
+
+    const max = Math.max(...items.map(x => x.num), 1);
+    items.sort((a,b) => b.num - a.num);
+
+    const bars = items.map(x => {
+      const pct = (x.num / max) * 100;
+      const note = typeof x.raw === 'string' ? x.raw.replace(/^\d+\s*/, '').trim() : '';
+      return `
+        <div class="wf-row">
+          <div class="wf-name">${escapeHtml(x.name)}${note ? ` <span class="muted" style="font-size:10.5px;">— ${escapeHtml(note)}</span>` : ''}</div>
+          <div class="wf-bar">
+            <div class="wf-seg wf-seg-cur" style="width:${pct}%">${x.num}</div>
+          </div>
+        </div>`;
+    }).join('');
+
+    return `
+      <div class="wf-card">
+        <div class="wf-card-head">
+          <h3>${cat.icon} ${escapeHtml(cat.label)}</h3>
+          <div class="wf-chips">
+            <span class="wf-chip wf-chip-cur">الإجمالي ${cat.total}</span>
           </div>
         </div>
         ${bars}
