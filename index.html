@@ -281,6 +281,7 @@
   .tr-net-pos{background:var(--green-bg); color:var(--green);}
   .tr-net-neg{background:var(--red-bg); color:var(--red);}
   .tr-net-zero{background:var(--gray-100); color:var(--gray-700);}
+  .tr-net-jobs{background:var(--blue-50); color:var(--blue-600); font-size:12.5px; font-weight:900; padding:5px 12px; border-radius:999px; white-space:nowrap;}
   .tr-cols{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
   .tr-col-title{font-size:11px; font-weight:900; margin-bottom:8px; display:flex; align-items:center; gap:4px;}
   .tr-col-title.tr-in{color:var(--green);}
@@ -476,7 +477,7 @@
         <p class="muted">الوظائف المعتمدة رسميًا لكل منشأة، مع قرارات إعادة توزيع الكوادر لتحقيق التوازن بين الجهات (2025-2026)</p>
       </div>
       <div class="tr-legend">
-        <span><i style="background:var(--blue-500);"></i> عدد الوظائف المعتمدة رسميًا</span>
+        <span><i style="background:var(--blue-500);"></i> عدد الوظائف المقترحة/المستحدثة للتوظيف</span>
         <span><i style="background:var(--green);"></i> دعم تم إنجازه فعليًا</span>
         <span><i style="background:var(--orange);"></i> قيد الإنجاز — نوصي باستكماله بدعم وظيفي</span>
       </div>
@@ -689,7 +690,7 @@ function renderWorkforcePlan(){
   const statsEl = document.getElementById('wfPlanStatsRow');
   if(statsEl){
     statsEl.innerHTML = `
-      <div class="stat-card total"><div class="num">${totalJobs}</div><div class="lbl">🗂️ وظيفة معتمدة رسميًا</div></div>
+      <div class="stat-card total"><div class="num">${totalJobs}</div><div class="lbl">🗂️ وظيفة مقترحة/مستحدثة للتوظيف</div></div>
       <div class="stat-card progress"><div class="num">${totalIn}</div><div class="lbl">🔁 قرار نقل/دعم</div></div>
       <div class="stat-card notstarted"><div class="num">${totalPending}</div><div class="lbl">⏳ قيد الإنجاز</div></div>
       <div class="stat-card late"><div class="num">${list.filter(r=>r.net<0).length}</div><div class="lbl">منشأة داعمة (صافي سالب)</div></div>
@@ -715,6 +716,7 @@ function renderWorkforcePlan(){
     const netChipClass = r.net > 0 ? 'tr-net-pos' : (r.net < 0 ? 'tr-net-neg' : 'tr-net-zero');
     const netLabel = r.net > 0 ? `+${r.net} دعم` : (r.net < 0 ? `${r.net} دعم` : 'متعادل');
     const jobs = jobDistChipsFor(r.name);
+    const totalJobsFacility = jobs.reduce((a,j) => a + j.num, 0);
     const jobsHtml = jobs.length
       ? `<div class="wf-chips" style="flex-wrap:wrap; margin-bottom:14px;">${jobs.map(j => `<span class="wf-chip wf-chip-cur">${j.icon} ${escapeHtml(j.label)}: ${escapeHtml(String(j.raw))}</span>`).join('')}</div>`
       : '';
@@ -722,7 +724,10 @@ function renderWorkforcePlan(){
       <div class="tr-card ${netClass}">
         <div class="tr-head">
           <div class="tr-name">🏥 ${escapeHtml(r.name)}</div>
-          <div class="tr-net ${netChipClass}">${netLabel}</div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <div class="tr-net ${netChipClass}">${netLabel}</div>
+            ${totalJobsFacility > 0 ? `<div class="tr-net-jobs">+${totalJobsFacility} توظيف</div>` : ''}
+          </div>
         </div>
         ${jobsHtml}
         <div class="tr-cols">
