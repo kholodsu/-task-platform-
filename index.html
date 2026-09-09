@@ -716,7 +716,7 @@ function renderWorkforcePlan(){
   wrap.innerHTML = list.map(r => {
     const netClass = r.net > 0 ? 'tr-pos' : (r.net < 0 ? 'tr-neg' : '');
     const netChipClass = r.net > 0 ? 'tr-net-pos' : (r.net < 0 ? 'tr-net-neg' : 'tr-net-zero');
-    const netLabel = r.net > 0 ? `+${r.net} دعم` : (r.net < 0 ? `${r.net} دعم` : 'متعادل');
+    const netLabel = r.net > 0 ? `+${r.net} دعم` : (r.net < 0 ? `${r.net} دعم` : `دخول ${r.in.length} · خروج ${r.out.length}`);
     const jobs = jobDistChipsFor(r.name);
     const totalJobsFacility = jobs.reduce((a,j) => a + j.num, 0);
     const jobsHtml = jobs.length
