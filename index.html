@@ -470,26 +470,18 @@
       <div id="workforceCards" class="wf-cards"></div>
     </div>
 
-    <div id="section-jobdist" class="section-panel" style="display:none;">
+    <div id="section-workforceplan" class="section-panel" style="display:none;">
       <div class="panel-head">
-        <h2>توزيع الوظائف</h2>
-        <p class="muted">عدد الوظائف المساندة الموزّعة على منشآت التجمع لكل تخصص</p>
-      </div>
-      <div class="stats-row" id="jobdistStatsRow"></div>
-      <div id="jobdistCards" class="wf-cards"></div>
-    </div>
-
-    <div id="section-transfers" class="section-panel" style="display:none;">
-      <div class="panel-head">
-        <h2>إعادة توزيع القوى العاملة</h2>
-        <p class="muted">قرارات إعادة توزيع الكوادر بين المنشآت خلال 2025-2026، لتحقيق التوازن بين الجهات</p>
+        <h2>التوظيف وإعادة التوزيع</h2>
+        <p class="muted">الوظائف المعتمدة رسميًا لكل منشأة، مع قرارات إعادة توزيع الكوادر لتحقيق التوازن بين الجهات (2025-2026)</p>
       </div>
       <div class="tr-legend">
-        <span><i style="background:var(--green);"></i> تم إنجازه فعليًا</span>
+        <span><i style="background:var(--blue-500);"></i> عدد الوظائف المعتمدة رسميًا</span>
+        <span><i style="background:var(--green);"></i> دعم تم إنجازه فعليًا</span>
         <span><i style="background:var(--orange);"></i> قيد الإنجاز — نوصي باستكماله بدعم وظيفي</span>
       </div>
-      <div class="stats-row" id="transfersStatsRow"></div>
-      <div id="transfersCards" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:16px;"></div>
+      <div class="stats-row" id="wfPlanStatsRow"></div>
+      <div id="wfPlanCards" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:16px;"></div>
     </div>
 
     <div id="section-projects" class="section-panel" style="display:none;">
@@ -528,8 +520,7 @@ const WORKFORCE_REDISTRIBUTION = [{"id": "north_tower", "name": "مستشفى ب
 const SECTIONS = [
   {id:'tasks', label:'متابعة المهام', icon:'✅'},
   {id:'workforce', label:'القوى العاملة', icon:'👥'},
-  {id:'jobdist', label:'توزيع الوظائف', icon:'🗂️'},
-  {id:'transfers', label:'إعادة توزيع القوى العاملة', icon:'⚖️'},
+  {id:'workforceplan', label:'التوظيف وإعادة التوزيع', icon:'⚖️'},
   {id:'projects', label:'لوحة المشاريع', icon:'📊'},
   {id:'staff', label:'بيانات الموظفين', icon:'🪪'},
 ];
@@ -554,8 +545,7 @@ function switchSection(id){
   });
   renderSectionNav();
   if(id === 'workforce') renderWorkforce();
-  if(id === 'jobdist') renderJobDistribution();
-  if(id === 'transfers') renderTransfers();
+  if(id === 'workforceplan') renderWorkforcePlan();
   if(id === 'projects') renderProjects();
   if(id === 'staff') renderStaff();
 }
@@ -655,19 +645,54 @@ async function renderWorkforce(){
   }).join('') || '<div class="empty-state">لا توجد بيانات</div>';
 }
 
-/* ---------- Transfers board (workforce redistribution 2025-2026) ---------- */
-function renderTransfers(){
+/* ---------- Workforce plan (merged: official job distribution + redistribution) ---------- */
+function jobDistNumeric(v){
+  if(typeof v === 'number') return v;
+  const m = String(v).match(/\d+/);
+  return m ? parseInt(m[0], 10) : 0;
+}
+
+function matchJobDistIndex(facilityName){
+  const s = facilityName;
+  return JOB_DISTRIBUTION.hospitals.findIndex(h => {
+    if(h === s) return true;
+    if(s.includes('برج الشمال') && h.includes('برج الشمال')) return true;
+    if(s.includes('عبدالعزيز بن مساعد') && h.includes('عبدالعزيز بن مساعد')) return true;
+    if(s.includes('رفحاء العام') && h.includes('رفحاء العام')) return true;
+    if(s.includes('العويقيلة') && h.includes('العويقيلة')) return true;
+    if(s.includes('الشعبة') && h.includes('الشعبة')) return true;
+    if(s.includes('طريف') && h.includes('طريف')) return true;
+    if(s.includes('الرعاية المديدة') && h.includes('الرعاية المديدة')) return true;
+    if(s.includes('جديدة عرعر') && h.includes('جديدة عرعر')) return true;
+    if(s.includes('برفحاء') && h.includes('برفحاء')) return true;
+    if(s.includes('النساء') && h.includes('النساء') && s.includes('بعرعر') && h.includes('بعرعر')) return true;
+    return false;
+  });
+}
+
+function jobDistChipsFor(facilityName){
+  const idx = matchJobDistIndex(facilityName);
+  if(idx === -1) return [];
+  return JOB_DISTRIBUTION.categories.map(cat => {
+    const raw = cat.values[idx];
+    const num = jobDistNumeric(raw);
+    return num > 0 ? {icon: cat.icon, label: cat.label, raw, num} : null;
+  }).filter(Boolean);
+}
+
+function renderWorkforcePlan(){
   const list = WORKFORCE_REDISTRIBUTION;
   const totalIn = list.reduce((a,r) => a + r.in.length, 0);
   const totalPending = list.reduce((a,r) => a + r.in.filter(x => x.status === 'pending').length, 0);
+  const totalJobs = JOB_DISTRIBUTION.categories.reduce((a,c) => a + c.total, 0);
 
-  const statsEl = document.getElementById('transfersStatsRow');
+  const statsEl = document.getElementById('wfPlanStatsRow');
   if(statsEl){
     statsEl.innerHTML = `
-      <div class="stat-card total"><div class="num">${totalIn}</div><div class="lbl">🔁 قرار نقل/دعم</div></div>
-      <div class="stat-card progress"><div class="num">${list.filter(r=>r.net>0).length}</div><div class="lbl">منشأة استفادت (صافي موجب)</div></div>
-      <div class="stat-card late"><div class="num">${list.filter(r=>r.net<0).length}</div><div class="lbl">منشأة داعمة (صافي سالب)</div></div>
+      <div class="stat-card total"><div class="num">${totalJobs}</div><div class="lbl">🗂️ وظيفة معتمدة رسميًا</div></div>
+      <div class="stat-card progress"><div class="num">${totalIn}</div><div class="lbl">🔁 قرار نقل/دعم</div></div>
       <div class="stat-card notstarted"><div class="num">${totalPending}</div><div class="lbl">⏳ قيد الإنجاز</div></div>
+      <div class="stat-card late"><div class="num">${list.filter(r=>r.net<0).length}</div><div class="lbl">منشأة داعمة (صافي سالب)</div></div>
     `;
   }
 
@@ -684,17 +709,22 @@ function renderTransfers(){
       </div>`;
   }
 
-  const wrap = document.getElementById('transfersCards');
+  const wrap = document.getElementById('wfPlanCards');
   wrap.innerHTML = list.map(r => {
     const netClass = r.net > 0 ? 'tr-pos' : (r.net < 0 ? 'tr-neg' : '');
     const netChipClass = r.net > 0 ? 'tr-net-pos' : (r.net < 0 ? 'tr-net-neg' : 'tr-net-zero');
     const netLabel = r.net > 0 ? `+${r.net} دعم` : (r.net < 0 ? `${r.net} دعم` : 'متعادل');
+    const jobs = jobDistChipsFor(r.name);
+    const jobsHtml = jobs.length
+      ? `<div class="wf-chips" style="flex-wrap:wrap; margin-bottom:14px;">${jobs.map(j => `<span class="wf-chip wf-chip-cur">${j.icon} ${escapeHtml(j.label)}: ${escapeHtml(String(j.raw))}</span>`).join('')}</div>`
+      : '';
     return `
       <div class="tr-card ${netClass}">
         <div class="tr-head">
           <div class="tr-name">🏥 ${escapeHtml(r.name)}</div>
           <div class="tr-net ${netChipClass}">${netLabel}</div>
         </div>
+        ${jobsHtml}
         <div class="tr-cols">
           <div>
             <div class="tr-col-title tr-in">⬆ دخول (${r.in.length})</div>
@@ -707,64 +737,6 @@ function renderTransfers(){
         </div>
       </div>`;
   }).join('');
-}
-
-/* ---------- Job distribution (read-only, from official headcount table) ---------- */
-function jobDistNumeric(v){
-  if(typeof v === 'number') return v;
-  const m = String(v).match(/\d+/);
-  return m ? parseInt(m[0], 10) : 0;
-}
-
-function renderJobDistribution(){
-  const totalAll = JOB_DISTRIBUTION.categories.reduce((a,c) => a + c.total, 0);
-
-  const statsEl = document.getElementById('jobdistStatsRow');
-  if(statsEl){
-    statsEl.innerHTML = JOB_DISTRIBUTION.categories.map(c => `
-      <div class="stat-card total"><div class="num">${c.total}</div><div class="lbl">${c.icon} ${escapeHtml(c.label)}</div></div>
-    `).join('') + `
-      <div class="stat-card progress"><div class="num">${totalAll}</div><div class="lbl">🗂️ إجمالي الوظائف المساندة</div></div>
-      <div class="stat-card notstarted"><div class="num" style="font-size:15px;">${JOB_DISTRIBUTION.hospitals.length}</div><div class="lbl">عدد المنشآت</div></div>
-    `;
-  }
-
-  const wrap = document.getElementById('jobdistCards');
-  wrap.innerHTML = JOB_DISTRIBUTION.categories.map(cat => {
-    const items = JOB_DISTRIBUTION.hospitals.map((h,i) => ({
-      name: h,
-      raw: cat.values[i],
-      num: jobDistNumeric(cat.values[i]),
-    })).filter(x => x.num > 0);
-
-    if(items.length === 0) return '';
-
-    const max = Math.max(...items.map(x => x.num), 1);
-    items.sort((a,b) => b.num - a.num);
-
-    const bars = items.map(x => {
-      const pct = (x.num / max) * 100;
-      const note = typeof x.raw === 'string' ? x.raw.replace(/^\d+\s*/, '').trim() : '';
-      return `
-        <div class="wf-row">
-          <div class="wf-name">${escapeHtml(x.name)}${note ? ` <span class="muted" style="font-size:10.5px;">— ${escapeHtml(note)}</span>` : ''}</div>
-          <div class="wf-bar">
-            <div class="wf-seg wf-seg-cur" style="width:${pct}%">${x.num}</div>
-          </div>
-        </div>`;
-    }).join('');
-
-    return `
-      <div class="wf-card">
-        <div class="wf-card-head">
-          <h3>${cat.icon} ${escapeHtml(cat.label)}</h3>
-          <div class="wf-chips">
-            <span class="wf-chip wf-chip-cur">الإجمالي ${cat.total}</span>
-          </div>
-        </div>
-        ${bars}
-      </div>`;
-  }).join('') || '<div class="empty-state">لا توجد بيانات</div>';
 }
 
 /* ---------- Projects (editable) ---------- */
