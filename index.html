@@ -475,12 +475,12 @@
     <div id="section-workforceplan" class="section-panel" style="display:none;">
       <div class="panel-head">
         <h2>التوظيف وإعادة التوزيع</h2>
-        <p class="muted">الوظائف المعتمدة رسميًا لكل منشأة، مع قرارات إعادة توزيع الكوادر لتحقيق التوازن بين الجهات (2025-2026)</p>
+        <p class="muted">التوزيع المقترح للوظائف مع إعادة التوزيع داخل الجهات لتحقيق التوازن (2025-2026)</p>
       </div>
       <div class="tr-legend">
-        <span><i style="background:var(--blue-500);"></i> عدد الوظائف المقترحة/المستحدثة للتوظيف</span>
+        <span><i style="background:var(--blue-500);"></i> عدد الوظائف المقترحة</span>
         <span><i style="background:var(--green);"></i> دعم تم إنجازه فعليًا</span>
-        <span><i style="background:var(--orange);"></i> قيد الإنجاز — نوصي باستكماله بدعم وظيفي</span>
+        <span><i style="background:var(--orange);"></i> قيد الإنجاز — نوصي باستكماله من خلال التوزيع الداخلي</span>
       </div>
       <div class="stats-row" id="wfPlanStatsRow"></div>
       <div id="wfPlanCards" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:16px;"></div>
@@ -691,7 +691,7 @@ function renderWorkforcePlan(){
   const statsEl = document.getElementById('wfPlanStatsRow');
   if(statsEl){
     statsEl.innerHTML = `
-      <div class="stat-card total"><div class="num">${totalJobs}</div><div class="lbl">🗂️ وظيفة مقترحة/مستحدثة للتوظيف</div></div>
+      <div class="stat-card total"><div class="num">${totalJobs}</div><div class="lbl">🗂️ وظيفة مقترحة</div></div>
       <div class="stat-card progress"><div class="num">${totalIn}</div><div class="lbl">🔁 قرار نقل/دعم</div></div>
       <div class="stat-card notstarted"><div class="num">${totalPending}</div><div class="lbl">⏳ قيد الإنجاز</div></div>
       <div class="stat-card late"><div class="num">${list.filter(r=>r.net<0).length}</div><div class="lbl">منشأة داعمة (صافي سالب)</div></div>
@@ -708,7 +708,7 @@ function renderWorkforcePlan(){
       <div class="tr-item tr-${kind}-item${pending ? ' tr-pending' : ''}${done ? ' tr-done' : ''}">
         <span class="tr-role">${person}${escapeHtml(x.role || '')}</span>
         <span class="tr-meta">${arrow}: ${escapeHtml(place)} ${x.note ? '· ' + escapeHtml(x.note) : ''}</span>
-        ${pending ? `<span class="tr-status-badge">⏳ قيد الإنجاز — يوصى بدعم وظيفي</span>` : ''}
+        ${pending ? `<span class="tr-status-badge">⏳ قيد الإنجاز — نوصي باستكماله من خلال التوزيع الداخلي</span>` : ''}
       </div>`;
   }
 
